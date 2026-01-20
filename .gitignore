@@ -9,6 +9,8 @@ wheels/
 *.egg-info
 .python-version
 
+www/*.html
+
 
 # Virtual environments
 .venv
