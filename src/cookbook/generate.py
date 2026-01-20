@@ -6,7 +6,7 @@ from ._types import ParsedRecipe
 
 
 
-def generate_recipe(template: io.TextIOBase, recipe: ParsedRecipe) -> str:
+def generate_recipe(template: Template, recipe: ParsedRecipe) -> str:
     """Generate a recipe string from a template and a ParsedRecipe object.
 
     Args:
@@ -15,8 +15,6 @@ def generate_recipe(template: io.TextIOBase, recipe: ParsedRecipe) -> str:
     Returns:
         A string containing the generated recipe.
     """
-    template_str = Template(template.read())
-
     ingredients_str = "\n".join(
         f'<li><span class="qty">{ing.quantity}</span><span class="unit">{ing.unit}</span>'
         f'<span class="ingredient">{ing.name}</span></li>'
@@ -31,7 +29,7 @@ def generate_recipe(template: io.TextIOBase, recipe: ParsedRecipe) -> str:
         for tag in recipe.tags
     )
 
-    result = template_str.substitute(
+    result = template.substitute(
         title=recipe.title,
         servings=recipe.servings,
         time="N/A",
