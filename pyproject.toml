@@ -1,0 +1,26 @@
+[project]
+name = "cookbook"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Matthew Chivers", email = "matthew.j.chivers@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "pyyaml>=6.0.3",
+    "typer>=0.21.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.2,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
+
+[tool.pytest.ini_options]
+python_files = ["*.py"]
+python_functions = ["test_*"]
