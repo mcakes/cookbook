@@ -64,7 +64,7 @@ a:visited {
 
 /* ---------- Layout Container ---------- */
 article {
-  max-width: 760px;
+  max-width: 1020px;
   margin: 0 auto;
   background: var(--paper);
   border: 1px solid var(--rule);
@@ -211,7 +211,7 @@ li {
 /* Ingredients: structured grid layout */
 .ingredients li {
   display: grid;
-  grid-template-columns: 4ch 6ch 1fr;
+  grid-template-columns: 4ch 7ch 1fr;
   column-gap: 0.5rem;
   align-items: baseline;
   padding-left: 0.15rem;
@@ -232,6 +232,13 @@ li {
   font-weight: 500;
 }
 
+.ingredients .processing {
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.9em;
+  font-weight: 400;
+}
+
 /* Steps: enhanced styling */
 .steps li {
   margin: 0.7rem 0;
@@ -240,6 +247,12 @@ li {
 .steps li::marker {
   font-weight: 750;
   color: var(--muted);
+}
+
+.steps .step-ingredient {
+  font-weight: 400;
+  color: #8b5a3c;
+  border-bottom: 1px dotted rgba(139, 90, 60, 0.4);
 }
 
 /* ---------- Responsive Design ---------- */

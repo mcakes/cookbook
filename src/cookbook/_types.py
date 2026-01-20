@@ -5,6 +5,7 @@ class Ingredient:
     name: str
     quantity: float
     unit: str
+    processing:str | None = None
 
 @dataclass(frozen=True)
 class ParsedRecipe:

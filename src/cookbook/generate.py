@@ -1,7 +1,7 @@
 import io 
 from string import Template
 
-from ._types import ParsedRecipe
+from ._types import Ingredient, ParsedRecipe
 
 
 
@@ -17,11 +17,28 @@ def generate_recipe(template: Template, recipe: ParsedRecipe) -> str:
     """
     ingredients_str = "\n".join(
         f'<li><span class="qty">{ing.quantity}</span><span class="unit">{ing.unit}</span>'
-        f'<span class="ingredient">{ing.name}</span></li>'
+        f'<span class="ingredient">{ing.name}'
+        f'{f"<span class=\"processing\"> ({ing.processing})</span>" if ing.processing else ""}</span></li>'
         for ing in recipe.ingredients
     )
+    def highlight_ingredients_in_text(text: str, ingredients: list[Ingredient]) -> str:
+        """Highlight ingredient names in step text."""
+        import re
+        result = text
+        
+        # Sort ingredients by length (longest first) to avoid partial matches
+        ingredient_names = sorted([ing.name.strip() for ing in ingredients], key=len, reverse=True)
+        
+        for ingredient_name in ingredient_names:
+            # Use word boundary regex to match whole words only
+            pattern = r'\b' + re.escape(ingredient_name) + r'\b'
+            replacement = f'<span class="step-ingredient">{ingredient_name}</span>'
+            result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+        
+        return result
+    
     steps_str = "\n".join(
-        f"<li>{step}</li>"
+        f"<li>{highlight_ingredients_in_text(step, recipe.ingredients)}</li>"
         for idx, step in enumerate(recipe.steps)
     )
     tags_str = "\n".join(
