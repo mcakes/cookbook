@@ -25,7 +25,7 @@ def generate_recipe(template: Template, recipe: ParsedRecipe) -> str:
         for idx, step in enumerate(recipe.steps)
     )
     tags_str = "\n".join(
-        f'<span class="tag">{tag}</span>'
+        f'<a href="index.html?tag={tag}" class="tag-chip">{tag}</a>'
         for tag in recipe.tags
     )
 
@@ -39,3 +39,49 @@ def generate_recipe(template: Template, recipe: ParsedRecipe) -> str:
     )
 
     return result
+
+
+def generate_home(template: Template, recipes: list[ParsedRecipe]) -> str:
+    """Generate a home page string from a template and a list of ParsedRecipe objects.
+
+    Args:
+        template: A file-like object containing the home page template.
+        recipes: A list of ParsedRecipe objects.
+    Returns:
+        A string containing the generated home page.
+    """
+    # Collect all unique tags from all recipes
+    all_tags = set()
+    for recipe in recipes:
+        all_tags.update(recipe.tags)
+    
+    # Generate HTML for tag chips
+    tags_str = "\n".join(
+        f'<span class="tag-chip" data-tag="{tag}">{tag}</span>'
+        for tag in sorted(all_tags)
+    )
+    
+    # Generate HTML for recipe links
+    recipes_str = "\n".join(
+        f'<a href="{recipe_title_to_html_filename(recipe)}" '
+        f'class="recipe-item" data-tags="{",".join(recipe.tags)}">{recipe.title}</a>'
+        for recipe in recipes
+    )
+    
+    result = template.substitute(
+        all_tags=tags_str,
+        recipes=recipes_str
+    )
+    
+    return result
+
+def recipe_title_to_html_filename(recipe: ParsedRecipe) -> str:
+    """Convert a recipe title to a safe filename.
+
+    Args:
+        recipe: A ParsedRecipe object.
+    Returns:
+        A string containing the filename.
+    """
+    filename = recipe.title.lower().replace(" ", "-").replace("&", "and")
+    return f"{filename}.html"
