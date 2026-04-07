@@ -25,7 +25,11 @@ export function parseRecipe(markdown: string): Recipe {
 
 export function serializeRecipe(recipe: Recipe): string {
   const { body, ...frontmatter } = recipe;
-  return matter.stringify(`\n${body}\n`, frontmatter);
+  // Remove undefined values — YAML serializer can't handle them
+  const clean = Object.fromEntries(
+    Object.entries(frontmatter).filter(([, v]) => v !== undefined)
+  );
+  return matter.stringify(`\n${body}\n`, clean);
 }
 
 export function extractFrontmatter(recipe: Recipe): RecipeFrontmatter {
