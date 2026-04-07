@@ -1,7 +1,9 @@
 ---
-title: "Example Recipe"
+title: Example Recipe
 slug: example-recipe
-tags: [example, test]
+tags:
+  - example
+  - test
 rating: 3
 servings: 2
 prep_time: 10
@@ -11,8 +13,8 @@ ingredients:
   - 100g cheese
   - 1 clove garlic
 cook_log: []
-created: "2026-04-06"
-updated: "2026-04-06"
+created: '2026-04-06'
+updated: '2026-04-07'
 ---
 
 ## Method
