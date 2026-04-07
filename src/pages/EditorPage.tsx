@@ -1,3 +1,166 @@
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import MDEditor from "@uiw/react-md-editor";
+import { useAuth } from "../hooks/useAuth";
+import { useRecipe } from "../hooks/useRecipe";
+import { github } from "../lib/github-instance";
+import { serializeRecipe } from "../lib/markdown";
+import type { Recipe, CookLogEntry } from "../types/recipe";
+import RecipeForm from "../components/RecipeForm";
+import IngredientsEditor from "../components/IngredientsEditor";
+
+function slugify(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
 export default function EditorPage() {
-  return <p>Editor page — coming soon</p>;
+  const { slug } = useParams<{ slug: string }>();
+  const isNew = !slug;
+  const navigate = useNavigate();
+  const { token, authenticated } = useAuth();
+  const { recipe: existingRecipe, sha, loading } = useRecipe(slug);
+
+  const [title, setTitle] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [rating, setRating] = useState<number | undefined>(undefined);
+  const [servings, setServings] = useState<number | undefined>(undefined);
+  const [prepTime, setPrepTime] = useState<number | undefined>(undefined);
+  const [cookTime, setCookTime] = useState<number | undefined>(undefined);
+  const [ingredients, setIngredients] = useState<string[]>([""]);
+  const [body, setBody] = useState("");
+  const [cookLog, setCookLog] = useState<CookLogEntry[]>([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [currentSha, setCurrentSha] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (existingRecipe) {
+      setTitle(existingRecipe.title);
+      setTags(existingRecipe.tags);
+      setRating(existingRecipe.rating);
+      setServings(existingRecipe.servings);
+      setPrepTime(existingRecipe.prep_time);
+      setCookTime(existingRecipe.cook_time);
+      setIngredients(existingRecipe.ingredients);
+      setBody(existingRecipe.body);
+      setCookLog(existingRecipe.cook_log);
+    }
+  }, [existingRecipe]);
+
+  useEffect(() => {
+    if (sha) setCurrentSha(sha);
+  }, [sha]);
+
+  if (!authenticated) {
+    return <p className="text-gray-500">You must be logged in to edit recipes.</p>;
+  }
+
+  if (!isNew && loading) {
+    return <p className="text-gray-500">Loading recipe...</p>;
+  }
+
+  const handleSave = async () => {
+    if (!title.trim() || !token) return;
+
+    setSaving(true);
+    setSaveError(null);
+
+    const recipeSlug = slug ?? slugify(title);
+    const today = new Date().toISOString().split("T")[0];
+    const recipe: Recipe = {
+      title,
+      slug: recipeSlug,
+      tags,
+      rating,
+      servings,
+      prep_time: prepTime,
+      cook_time: cookTime,
+      ingredients: ingredients.filter((i) => i.trim()),
+      cook_log: cookLog,
+      created: existingRecipe?.created ?? today,
+      updated: today,
+      body,
+    };
+
+    try {
+      const newSha = await github.saveRecipeFile(
+        recipeSlug,
+        serializeRecipe(recipe),
+        token,
+        currentSha ?? undefined
+      );
+      setCurrentSha(newSha);
+      navigate(`/recipe/${recipeSlug}`);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!slug || !currentSha || !token) return;
+    if (!window.confirm(`Delete "${title}"? This cannot be undone.`)) return;
+
+    try {
+      await github.deleteRecipeFile(slug, currentSha, token);
+      navigate("/");
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Delete failed");
+    }
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">
+          {isNew ? "New Recipe" : `Edit: ${title}`}
+        </h1>
+        <div className="flex gap-2">
+          {!isNew && (
+            <button onClick={handleDelete} className="px-4 py-2 text-sm text-red-600 hover:text-red-800">
+              Delete
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving || !title.trim()}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </div>
+      </div>
+
+      {saveError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+          {saveError}
+        </div>
+      )}
+
+      <div className="space-y-6">
+        <RecipeForm
+          title={title} tags={tags} rating={rating} servings={servings}
+          prepTime={prepTime} cookTime={cookTime} cookLog={cookLog}
+          onTitleChange={setTitle} onTagsChange={setTags} onRatingChange={setRating}
+          onServingsChange={setServings} onPrepTimeChange={setPrepTime}
+          onCookTimeChange={setCookTime} onCookLogChange={setCookLog}
+        />
+
+        <IngredientsEditor ingredients={ingredients} onChange={setIngredients} />
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Method & Notes (Markdown)
+          </label>
+          <div data-color-mode="light">
+            <MDEditor value={body} onChange={(val) => setBody(val ?? "")} height={400} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
