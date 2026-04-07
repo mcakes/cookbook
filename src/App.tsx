@@ -1,21 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./hooks/useAuth";
+import Layout from "./components/Layout";
+import HomePage from "./pages/HomePage";
+import SearchPage from "./pages/SearchPage";
+import RecipePage from "./pages/RecipePage";
+import EditorPage from "./pages/EditorPage";
+import MealPlannerPage from "./pages/MealPlannerPage";
 
 function App() {
   return (
-    <BrowserRouter>
-      <div className="min-h-screen bg-gray-50">
-        <header className="bg-white shadow-sm">
-          <div className="max-w-6xl mx-auto px-4 py-4">
-            <h1 className="text-2xl font-bold text-gray-900">Cookbook3</h1>
-          </div>
-        </header>
-        <main className="max-w-6xl mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<p>Home</p>} />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/recipe/:slug" element={<RecipePage />} />
+            <Route path="/new" element={<EditorPage />} />
+            <Route path="/edit/:slug" element={<EditorPage />} />
+            <Route path="/meal-planner" element={<MealPlannerPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
