@@ -1,4 +1,4 @@
-const STORAGE_KEY = "cookbook3_meal_plan";
+const STORAGE_KEY = "cookbook_meal_plan";
 
 type DayOfWeek = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 

@@ -12,7 +12,7 @@ export default function Layout() {
       <header className="bg-white shadow-sm">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="text-2xl font-bold text-gray-900">
-            Cookbook3
+            Cookbook
           </Link>
           <nav className="flex items-center gap-6">
             <Link to="/" className="text-gray-600 hover:text-gray-900">
@@ -40,7 +40,7 @@ export default function Layout() {
       </main>
       <footer className="border-t border-gray-200 mt-16">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between text-sm text-gray-400">
-          <span>Cookbook3</span>
+          <span>Cookbook</span>
           <button
             onClick={() => (authenticated ? logout() : setShowAuth(true))}
             className="hover:text-gray-600"

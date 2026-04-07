@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GitHubClient } from "./github";
 
 const REPO_OWNER = "testuser";
-const REPO_NAME = "cookbook3";
+const REPO_NAME = "cookbook";
 
 describe("GitHubClient", () => {
   let client: GitHubClient;

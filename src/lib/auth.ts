@@ -1,4 +1,4 @@
-const STORAGE_KEY = "cookbook3_github_pat";
+const STORAGE_KEY = "cookbook_github_pat";
 
 export function getToken(): string | null {
   return localStorage.getItem(STORAGE_KEY);
