@@ -35,6 +35,8 @@ export default function EditorPage() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [currentSha, setCurrentSha] = useState<string | undefined>(undefined);
+  const [image, setImage] = useState<string | undefined>(existingRecipe?.image);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (existingRecipe) {
@@ -47,12 +49,34 @@ export default function EditorPage() {
       setIngredients(existingRecipe.ingredients);
       setBody(existingRecipe.body);
       setCookLog(existingRecipe.cook_log);
+      setImage(existingRecipe.image);
     }
   }, [existingRecipe]);
 
   useEffect(() => {
     if (sha) setCurrentSha(sha);
   }, [sha]);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !token) return;
+
+    setUploading(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64 = (reader.result as string).split(",")[1];
+        const filename = `${slug ?? slugify(title)}.${file.name.split(".").pop()}`;
+        await github.uploadImage(filename, base64, token);
+        setImage(filename);
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Image upload failed");
+      setUploading(false);
+    }
+  };
 
   if (!authenticated) {
     return <p className="text-gray-500">You must be logged in to edit recipes.</p>;
@@ -83,6 +107,7 @@ export default function EditorPage() {
       created: existingRecipe?.created ?? today,
       updated: today,
       body,
+      image,
     };
 
     try {
@@ -142,6 +167,15 @@ export default function EditorPage() {
       )}
 
       <div className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          {image && (
+            <img src={github.imageUrl(image)} alt="Recipe" className="w-48 h-32 object-cover rounded-md mb-2" />
+          )}
+          <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="text-sm" />
+          {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+        </div>
+
         <RecipeForm
           title={title} tags={tags} rating={rating} servings={servings}
           prepTime={prepTime} cookTime={cookTime} cookLog={cookLog}
