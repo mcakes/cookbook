@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Example Recipe",
+    "slug": "example-recipe",
+    "tags": [
+      "example",
+      "test"
+    ],
+    "rating": 3,
+    "servings": 2,
+    "prep_time": 10,
+    "cook_time": 20,
+    "ingredients": [
+      "200g pasta",
+      "100g cheese",
+      "1 clove garlic"
+    ],
+    "cook_log": [],
+    "created": "2026-04-06",
+    "updated": "2026-04-06"
+  }
+]

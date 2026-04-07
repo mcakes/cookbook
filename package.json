@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:index": "tsx scripts/build-index.ts",
+    "prebuild": "npm run build:index",
+    "predev": "npm run build:index",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -34,6 +37,7 @@
     "globals": "^17.4.0",
     "jsdom": "^29.0.1",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
     "vite": "^8.0.4",
