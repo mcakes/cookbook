@@ -12,6 +12,7 @@ ingredients:
   - 200g pasta
   - 100g cheese
   - 1 clove garlic
+  - 1 Whole man
 cook_log: []
 created: '2026-04-06'
 updated: '2026-04-07'
