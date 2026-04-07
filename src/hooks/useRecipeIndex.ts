@@ -7,7 +7,7 @@ export function useRecipeIndex() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/recipe-index.json")
+    fetch(`${import.meta.env.BASE_URL}recipe-index.json`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
