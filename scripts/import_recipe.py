@@ -27,14 +27,8 @@ REQUEST_TIMEOUT = 15
 class _PrettyDumper(yaml.SafeDumper):
     """Custom YAML dumper with 2-space indentation for nested lists."""
 
-    pass
-
-
-def _increase_indent(self, flow=False, indentless=False):
-    return super(_PrettyDumper, self).increase_indent(flow, False)
-
-
-_PrettyDumper.increase_indent = _increase_indent
+    def increase_indent(self, flow=False, indentless=False):
+        return super().increase_indent(flow, False)
 
 
 def _parse_servings(yields) -> int | None:
