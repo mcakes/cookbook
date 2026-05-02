@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useRecipe } from "../hooks/useRecipe";
 import { useAuth } from "../hooks/useAuth";
@@ -17,6 +18,9 @@ export default function RecipePage() {
   const { recipe, loading, error } = useRecipe(slug);
   const { authenticated } = useAuth();
   const { foods, mappings, loading: nutLoading, error: nutError } = useNutritionData();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // @ts-ignore -- editKey used in Task 15
+  const [editKey, setEditKey] = useState<string | null>(null);
 
   if (loading) return <p className="text-muted">Loading recipe…</p>;
   if (error) return <p className="text-danger">Error: {error}</p>;
@@ -76,7 +80,12 @@ export default function RecipePage() {
       <div className="md:grid md:grid-cols-[260px_1fr] md:gap-10">
         <aside className="mb-8 md:mb-0">
           <div className="bg-paper border border-line rounded-md p-5 md:sticky md:top-6">
-            <IngredientList ingredients={recipe.ingredients} />
+            <IngredientList
+              ingredients={recipe.ingredients}
+              nutritionRows={nutrition?.rows}
+              canEdit={authenticated}
+              onEditMatch={(key) => setEditKey(key)}
+            />
           </div>
         </aside>
         <div className="min-w-0">
