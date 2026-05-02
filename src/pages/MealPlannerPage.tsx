@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useRecipeIndex } from "../hooks/useRecipeIndex";
 import { getMealPlan, setMealPlan, clearMealPlan, type MealPlan } from "../lib/meal-plan";
+import { aggregateIngredients } from "../lib/ingredient-aggregator";
 import ShoppingList from "../components/ShoppingList";
 
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const;
@@ -56,12 +57,7 @@ export default function MealPlannerPage() {
         if (recipe) items.push(...recipe.ingredients);
       }
     }
-    const seen = new Map<string, string>();
-    items.forEach((item) => {
-      const key = item.toLowerCase();
-      if (!seen.has(key)) seen.set(key, item);
-    });
-    return Array.from(seen.values());
+    return aggregateIngredients(items);
   }, [plan, index]);
 
   const filteredRecipes = searchQuery.trim()
