@@ -24,6 +24,58 @@ LEADING_NUMBER_RE = re.compile(r"^\s*\d+\s*[.)\-]\s*")
 REQUEST_TIMEOUT = 15
 
 
+def _parse_servings(yields) -> int | None:
+    if yields is None:
+        return None
+    match = re.search(r"\d+", str(yields))
+    return int(match.group()) if match else None
+
+
+def _parse_instructions(instructions: str | None) -> list[str]:
+    if not instructions:
+        return []
+    steps: list[str] = []
+    for raw_line in instructions.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        line = LEADING_NUMBER_RE.sub("", line).strip()
+        if line:
+            steps.append(line)
+    return steps
+
+
+def build_recipe(scraped: dict, today: date | None = None) -> dict:
+    if not scraped.get("title"):
+        print("Error: scraped page has no title", file=sys.stderr)
+        sys.exit(1)
+    today = today or date.today()
+    today_str = today.isoformat()
+    title = scraped["title"]
+
+    recipe: dict = {
+        "title": title,
+        "slug": slugify(title),
+        "tags": [],
+    }
+    servings = _parse_servings(scraped.get("yields"))
+    if servings is not None:
+        recipe["servings"] = servings
+    if scraped.get("prep_time") is not None:
+        recipe["prep_time"] = scraped["prep_time"]
+    if scraped.get("cook_time") is not None:
+        recipe["cook_time"] = scraped["cook_time"]
+    if scraped.get("image"):
+        recipe["image"] = scraped["image"]
+
+    recipe["ingredients"] = list(scraped.get("ingredients") or [])
+    recipe["cook_log"] = []
+    recipe["created"] = today_str
+    recipe["updated"] = today_str
+    recipe["instructions"] = _parse_instructions(scraped.get("instructions"))
+    return recipe
+
+
 def main(url: str) -> None:
     raise NotImplementedError
 
