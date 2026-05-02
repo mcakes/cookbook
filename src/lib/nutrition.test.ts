@@ -144,7 +144,7 @@ describe("computeRecipeNutrition", () => {
       "olive oil": { foodId: "fdc:171413", confirmed: true, source: "manual" },
     };
     // no quantity → no-weight
-    const { rows } = computeRecipeNutrition(["olive oil to taste"], foods, mappings);
+    const { rows } = computeRecipeNutrition(["olive oil"], foods, mappings);
     expect(rows[0].status).toBe("no-weight");
   });
 

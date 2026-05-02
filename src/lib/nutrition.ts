@@ -78,15 +78,6 @@ const ZERO_TOTALS = (): NutritionTotals => ({
   unmatchedCount: 0,
 });
 
-/** Find a mapping entry whose key is a prefix of `key` (word-boundary aligned). */
-function lookupMappingPrefix(key: string, mappings: Mappings): IngredientMapping | undefined {
-  // Try longest prefix first — sort keys by descending length
-  const candidates = Object.keys(mappings)
-    .filter((k) => key === k || key.startsWith(k + " "))
-    .sort((a, b) => b.length - a.length);
-  return candidates.length > 0 ? mappings[candidates[0]] : undefined;
-}
-
 export function computeRecipeNutrition(
   ingredients: string[],
   foods: Food[],
@@ -99,7 +90,7 @@ export function computeRecipeNutrition(
   for (const ingredient of ingredients) {
     const parsed = parseQuantity(ingredient);
     const key = normaliseKey(parsed.rest);
-    const explicit = mappings[key] ?? lookupMappingPrefix(key, mappings);
+    const explicit = mappings[key];
     let mapping = explicit;
 
     if (!mapping) {
