@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useRecipe } from "../hooks/useRecipe";
 import { useAuth } from "../hooks/useAuth";
@@ -24,6 +24,11 @@ export default function RecipePage() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const inFlightRef = useRef<Promise<unknown> | null>(null);
   const pendingRef = useRef<Mappings | null>(null);
+  const mappingsShaRef = useRef<string | null>(mappingsSha);
+
+  useEffect(() => {
+    mappingsShaRef.current = mappingsSha;
+  }, [mappingsSha]);
 
   if (loading) return <p className="text-muted">Loading recipe…</p>;
   if (error) return <p className="text-danger">Error: {error}</p>;
@@ -40,13 +45,14 @@ export default function RecipePage() {
       return;
     }
     const tryCommit = async (payload: Mappings) => {
-      let sha = mappingsSha;
+      let sha = mappingsShaRef.current;
       if (!sha) {
         // Look up the live sha if we don't have one yet (initial fetch was unauth).
         const fresh = await github.fetchMappingsViaApi(token);
         sha = fresh.sha;
       }
       const newSha = await github.saveMappings(payload, token, sha);
+      mappingsShaRef.current = newSha;
       setMappings(payload, newSha);
     };
     const p = tryCommit(next).finally(() => {
@@ -67,7 +73,7 @@ export default function RecipePage() {
     setMappings(next, mappingsSha);   // optimistic
     setEditKey(null);
     commitMappings(next).catch((e: Error) => {
-      setMappings(prev, mappingsSha); // rollback
+      setMappings(prev, mappingsShaRef.current); // rollback
       setSaveError(`Failed to save: ${e.message}`);
     });
   }
@@ -147,9 +153,14 @@ export default function RecipePage() {
       />
     )}
     {saveError && (
-      <div role="alert" className="fixed bottom-4 right-4 bg-paper border border-danger text-danger px-3 py-2 rounded text-sm">
+      <button
+        role="alert"
+        onClick={() => setSaveError(null)}
+        className="fixed bottom-4 right-4 bg-paper border border-danger text-danger px-3 py-2 rounded text-sm hover:bg-danger/5"
+        aria-label="Dismiss error"
+      >
         {saveError}
-      </div>
+      </button>
     )}
     </ServingsProvider>
   );
