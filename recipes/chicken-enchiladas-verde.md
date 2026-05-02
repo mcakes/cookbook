@@ -17,7 +17,7 @@ ingredients:
   - 2 cobs of corn
   - 5 cloves garlic
   - 2 lbs tomatillos
-  - 2 JalapeÃ±o peppers
+  - 2 Jalapeno peppers
   - 2 Serrano peppers
   - 1 bunch cilantro
   - Corn or flour tortillas
