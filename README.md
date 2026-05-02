@@ -71,3 +71,22 @@ export default defineConfig([
   },
 ])
 ```
+
+## Importing recipes from URLs
+
+Use the Python script in `scripts/` to scrape a recipe from a popular recipe website (AllRecipes, BBC Good Food, NYT Cooking, etc.) and save it as a markdown file in `recipes/`.
+
+One-time setup (requires [`uv`](https://github.com/astral-sh/uv)):
+
+```bash
+uv venv
+uv pip install -r scripts/requirements.txt
+```
+
+Then for each recipe:
+
+```bash
+.venv/bin/python scripts/import_recipe.py <url>
+```
+
+The script writes a new file at `recipes/<slug>.md`. Personal fields (`rating`, `tags`, `cook_log`) are left blank for you to fill in. The recipe index is rebuilt automatically the next time you run `npm run dev` or `npm run build`.
