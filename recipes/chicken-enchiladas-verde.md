@@ -1,11 +1,15 @@
 ---
-title: "Chicken Enchiladas Verde"
+title: Chicken Enchiladas Verde
 slug: chicken-enchiladas-verde
-tags: [mexican, chicken, enchiladas, verde]
+tags:
+  - mexican
+  - chicken
+  - enchiladas
+  - verde
 rating: 4
 servings: 2
-prep_time: 10
-cook_time: 20
+prep_time: 20
+cook_time: 60
 ingredients:
   - 1 whole chicken
   - 2 bay leaves
@@ -13,13 +17,13 @@ ingredients:
   - 2 cobs of corn
   - 5 cloves garlic
   - 2 lbs tomatillos
-  - 2 Jalapeño peppers
+  - 2 JalapeÃ±o peppers
   - 2 Serrano peppers
   - 1 bunch cilantro
   - Corn or flour tortillas
 cook_log: []
-created: "2026-04-11"
-updated: "2026-04-11"
+created: '2026-04-11'
+updated: '2026-05-02'
 ---
 
 ## Method
@@ -31,12 +35,10 @@ updated: "2026-04-11"
 5. Cut kernels off the corn cobs.
 6. When chicken is cool enough to handle, shred it.
 7. Mix shredded chicken with corn and set aside.
-8. In dutch oven, add tomatillos, Jalapeño peppers, Serrano peppers, remaining onion, and garlic cloves. Cover with water and bring to boil. Simmer until tomatillos change color.
+8. In dutch oven, add tomatillos, JalapeÃ±o peppers, Serrano peppers, remaining onion, and garlic cloves. Cover with water and bring to boil. Simmer until tomatillos change color.
 9. Add tomatillos, peppers (may want to only transfer 1/2 of the peppers), onion and garlic to blender.
 10. Add some of the reserved broth and bunch of cilantro (reserve some for garnish)to the blender and blend.
 11. Add blended sauce to dutch oven and simmer for 10 minutes.
 12. Heat tortillas, set aside.
 13. Heat chicken and corn mixture in saucepan over low to medium head. Add some sauce and cheese to the chicken. 
-14. Spoon chicken mixture into tortillas, roll and smoother with sauce. Top with additional cheese and cilantro. Can also garnish with red onion and avocados. Serve with rice and beans. 
-
-
+14. Spoon chicken mixture into tortillas, roll and smoother with sauce. Top with additional cheese and cilantro. Can also garnish with red onion and avocados. Serve with rice and beans.
