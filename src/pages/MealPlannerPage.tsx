@@ -91,7 +91,7 @@ export default function MealPlannerPage() {
                   </Link>
                   <button
                     onClick={() => removeRecipe(day, i)}
-                    className="text-muted group-hover:text-danger ml-1"
+                    className="text-line group-hover:text-danger ml-1"
                   >
                     ×
                   </button>

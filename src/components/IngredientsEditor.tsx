@@ -44,7 +44,7 @@ export default function IngredientsEditor({ ingredients, onChange }: Ingredients
       <button
         type="button"
         onClick={addLine}
-        className="mt-2 text-sm text-accent hover:text-ink"
+        className="mt-2 text-sm text-accent hover:text-accent-hover"
       >
         + Add ingredient
       </button>
