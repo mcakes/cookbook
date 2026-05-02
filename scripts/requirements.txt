@@ -1,0 +1,5 @@
+recipe-scrapers>=15.0
+requests>=2.31
+python-slugify>=8.0
+pyyaml>=6.0
+pytest>=8.0

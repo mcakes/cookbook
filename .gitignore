@@ -27,3 +27,6 @@ dist-ssr
 .superpowers/
 docs/superpowers
 .worktrees/
+
+# Python venv
+.venv/
