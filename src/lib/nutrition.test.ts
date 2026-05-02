@@ -91,3 +91,76 @@ describe("autoMatch", () => {
     expect(m).toBeNull();
   });
 });
+
+import { computeRecipeNutrition } from "./nutrition";
+import type { Mappings } from "./nutrition-types";
+
+describe("computeRecipeNutrition", () => {
+  const foods: Food[] = [tomatillo, olive];
+
+  it("computes per-recipe totals from confirmed mappings", () => {
+    const mappings: Mappings = {
+      "tomatillos":  { foodId: "fdc:11952", confirmed: true, source: "manual" },
+      "olive oil":   { foodId: "fdc:171413", confirmed: true, source: "manual" },
+    };
+    const { rows, totals } = computeRecipeNutrition(
+      ["2 lbs tomatillos", "2 tbsp olive oil"],
+      foods,
+      mappings
+    );
+    expect(rows).toHaveLength(2);
+    expect(rows[0].status).toBe("ok");
+    expect(rows[0].grams).toBeCloseTo(907.18, 1);
+    expect(totals.kcal).toBeCloseTo((907.18 * 32 + 14.7868 * 2 * 0.92 * 884) / 100, 1);
+    expect(totals.unmatchedCount).toBe(0);
+  });
+
+  it("auto-matches missing entries in memory without mutating input mappings", () => {
+    const mappings: Mappings = {};
+    const before = JSON.stringify(mappings);
+    const { rows } = computeRecipeNutrition(["2 lbs tomatillos"], foods, mappings);
+    expect(rows[0].status).toBe("ok");
+    expect(JSON.stringify(mappings)).toBe(before); // unchanged
+  });
+
+  it("flags unmatched ingredients and counts them", () => {
+    const { rows, totals } = computeRecipeNutrition(["2 lbs zorblax"], foods, {});
+    expect(rows[0].status).toBe("unmatched");
+    expect(totals.unmatchedCount).toBe(1);
+    expect(totals.kcal).toBe(0);
+  });
+
+  it("respects exclude flag", () => {
+    const mappings: Mappings = {
+      "salt to taste": { foodId: null, exclude: true, confirmed: true, source: "manual" },
+    };
+    const { rows, totals } = computeRecipeNutrition(["salt to taste"], foods, mappings);
+    expect(rows[0].status).toBe("excluded");
+    expect(totals.unmatchedCount).toBe(0);
+  });
+
+  it("flags resolved-but-no-weight rows", () => {
+    const mappings: Mappings = {
+      "olive oil": { foodId: "fdc:171413", confirmed: true, source: "manual" },
+    };
+    // no quantity → no-weight
+    const { rows } = computeRecipeNutrition(["olive oil to taste"], foods, mappings);
+    expect(rows[0].status).toBe("no-weight");
+  });
+
+  it("flags mappings pointing at missing foods", () => {
+    const mappings: Mappings = {
+      "ghost food": { foodId: "fdc:00000", confirmed: true, source: "manual" },
+    };
+    const { rows } = computeRecipeNutrition(["1 lb ghost food"], foods, mappings);
+    expect(rows[0].status).toBe("no-food");
+  });
+
+  it("propagates approximate flag from volume-without-density", () => {
+    const mappings: Mappings = {
+      "tomatillos": { foodId: "fdc:11952", confirmed: true, source: "manual" },
+    };
+    const { rows } = computeRecipeNutrition(["1 cup tomatillos"], foods, mappings);
+    expect(rows[0].status).toBe("approximate");
+  });
+});
