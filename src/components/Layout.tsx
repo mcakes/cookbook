@@ -8,26 +8,26 @@ export default function Layout() {
   const [showAuth, setShowAuth] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
+    <div className="min-h-screen">
+      <header className="bg-paper border-b border-line">
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-gray-900">
+          <Link to="/" className="font-display text-2xl font-medium text-ink tracking-tight">
             Cookbook
           </Link>
-          <nav className="flex items-center gap-6">
-            <Link to="/" className="text-gray-600 hover:text-gray-900">
+          <nav className="flex items-center gap-6 text-sm">
+            <Link to="/" className="text-muted hover:text-ink transition-colors">
               Browse
             </Link>
-            <Link to="/search" className="text-gray-600 hover:text-gray-900">
+            <Link to="/search" className="text-muted hover:text-ink transition-colors">
               Search
             </Link>
-            <Link to="/meal-planner" className="text-gray-600 hover:text-gray-900">
+            <Link to="/meal-planner" className="text-muted hover:text-ink transition-colors">
               Meal Planner
             </Link>
             {authenticated && (
               <Link
                 to="/new"
-                className="bg-green-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-green-700"
+                className="bg-accent text-paper px-3 py-1.5 rounded text-sm hover:bg-accent-hover transition-colors"
               >
                 + New Recipe
               </Link>
@@ -35,15 +35,15 @@ export default function Layout() {
           </nav>
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-10">
         <Outlet />
       </main>
-      <footer className="border-t border-gray-200 mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between text-sm text-gray-400">
+      <footer className="border-t border-line mt-16">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between text-sm text-muted">
           <span>Cookbook</span>
           <button
             onClick={() => (authenticated ? logout() : setShowAuth(true))}
-            className="hover:text-gray-600"
+            className="hover:text-ink transition-colors"
           >
             {authenticated ? "Logout" : "🔑"}
           </button>
