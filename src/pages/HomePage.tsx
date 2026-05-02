@@ -25,8 +25,8 @@ export default function HomePage() {
     return sortRecipes(recipes, sortBy);
   }, [index, searchIndex, query, selectedTag, sortBy]);
 
-  if (loading) return <p className="text-gray-500">Loading recipes...</p>;
-  if (error) return <p className="text-red-500">Error: {error}</p>;
+  if (loading) return <p className="text-muted">Loading recipes…</p>;
+  if (error) return <p className="text-danger">Error: {error}</p>;
 
   return (
     <div>
@@ -35,8 +35,8 @@ export default function HomePage() {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search recipes..."
-          className="w-full border rounded-lg px-4 py-2.5 text-lg"
+          placeholder="Search recipes…"
+          className="w-full bg-paper border border-line rounded-md px-4 py-2.5 text-lg text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
         />
       </div>
       <RecipeFilter
@@ -47,7 +47,7 @@ export default function HomePage() {
         onSortChange={setSortBy}
       />
       {filtered.length === 0 ? (
-        <p className="text-gray-500">No recipes found.</p>
+        <p className="text-muted">No recipes found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((recipe) => (
