@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useServings } from "../lib/servings-context";
 import { scaleIngredients } from "../lib/scaling";
 
 interface IngredientListProps {
   ingredients: string[];
-  baseServings?: number;
 }
 
-export default function IngredientList({ ingredients, baseServings }: IngredientListProps) {
-  const [servings, setServings] = useState(baseServings ?? 0);
+export default function IngredientList({ ingredients }: IngredientListProps) {
+  const { servings, setServings, baseServings } = useServings();
   const showScaler = baseServings !== undefined && baseServings > 0;
 
   const displayIngredients =
@@ -25,25 +24,19 @@ export default function IngredientList({ ingredients, baseServings }: Ingredient
               onClick={() => setServings(Math.max(1, servings - 1))}
               className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
               aria-label="Fewer servings"
-            >
-              −
-            </button>
+            >−</button>
             <span className="text-ink tabular-nums">{servings} servings</span>
             <button
               onClick={() => setServings(servings + 1)}
               className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
               aria-label="More servings"
-            >
-              +
-            </button>
+            >+</button>
           </div>
         )}
       </div>
       <ul className="space-y-2 text-sm leading-relaxed">
         {displayIngredients.map((ingredient, i) => (
-          <li key={i} className="text-ink">
-            {ingredient}
-          </li>
+          <li key={i} className="text-ink">{ingredient}</li>
         ))}
       </ul>
     </div>

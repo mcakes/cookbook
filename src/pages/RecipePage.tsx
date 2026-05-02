@@ -7,6 +7,7 @@ import IngredientList from "../components/IngredientList";
 import CookLog from "../components/CookLog";
 import MarkdownPreview from "../components/MarkdownPreview";
 import { github } from "../lib/github-instance";
+import { ServingsProvider } from "../lib/servings-context";
 
 export default function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
@@ -18,6 +19,7 @@ export default function RecipePage() {
   if (!recipe) return <p className="text-muted">Recipe not found.</p>;
 
   return (
+    <ServingsProvider baseServings={recipe.servings}>
     <article className="max-w-5xl mx-auto">
       {recipe.image && (
         <div className="aspect-video rounded-md overflow-hidden mb-8 border border-line">
@@ -61,10 +63,7 @@ export default function RecipePage() {
       <div className="md:grid md:grid-cols-[260px_1fr] md:gap-10">
         <aside className="mb-8 md:mb-0">
           <div className="bg-paper border border-line rounded-md p-5 md:sticky md:top-6">
-            <IngredientList
-              ingredients={recipe.ingredients}
-              baseServings={recipe.servings}
-            />
+            <IngredientList ingredients={recipe.ingredients} />
           </div>
         </aside>
         <div className="min-w-0">
@@ -75,5 +74,6 @@ export default function RecipePage() {
         </div>
       </div>
     </article>
+    </ServingsProvider>
   );
 }
