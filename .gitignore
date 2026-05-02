@@ -27,3 +27,6 @@ dist-ssr
 .superpowers/
 docs/superpowers
 .worktrees/
+
+scripts/.cache/*
+!scripts/.cache/.gitkeep
