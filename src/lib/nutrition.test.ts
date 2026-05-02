@@ -69,3 +69,25 @@ describe("resolveGrams", () => {
     expect(r.grams).toBeNull();
   });
 });
+
+import { autoMatch } from "./nutrition";
+
+describe("autoMatch", () => {
+  const foods: Food[] = [tomatillo, olive];
+
+  it("returns a confident match for an alias hit", () => {
+    const m = autoMatch("tomatillos", foods);
+    expect(m?.foodId).toBe("fdc:11952");
+    expect(m?.confidence).toBeGreaterThan(0.7);
+  });
+
+  it("matches close spellings", () => {
+    const m = autoMatch("tomatillo", foods);
+    expect(m?.foodId).toBe("fdc:11952");
+  });
+
+  it("returns null below threshold", () => {
+    const m = autoMatch("xylophone", foods);
+    expect(m).toBeNull();
+  });
+});

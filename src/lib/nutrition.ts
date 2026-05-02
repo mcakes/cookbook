@@ -48,3 +48,23 @@ export function resolveGrams(
   }
   return { grams: null };
 }
+
+import Fuse from "fuse.js";
+
+export interface AutoMatchResult {
+  foodId: string;
+  confidence: number;
+}
+
+const FUSE_OPTIONS = {
+  includeScore: true,
+  threshold: 0.3,
+  keys: ["aliases", "name"],
+};
+
+export function autoMatch(key: string, foods: Food[]): AutoMatchResult | null {
+  const fuse = new Fuse(foods, FUSE_OPTIONS);
+  const [best] = fuse.search(key, { limit: 1 });
+  if (!best || best.score === undefined || best.score > 0.3) return null;
+  return { foodId: best.item.id, confidence: 1 - best.score };
+}
