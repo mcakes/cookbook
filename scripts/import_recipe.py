@@ -131,6 +131,28 @@ def render_markdown(recipe: dict) -> str:
     )
 
 
+def resolve_slug(slug: str, recipes_dir: Path = RECIPES_DIR) -> str:
+    while (recipes_dir / f"{slug}.md").exists():
+        print(
+            f"recipes/{slug}.md already exists. Enter a new slug "
+            f"(Ctrl-C to abort):",
+            file=sys.stderr,
+        )
+        try:
+            candidate = input().strip()
+        except EOFError:
+            print("Aborted.", file=sys.stderr)
+            sys.exit(2)
+        if not SLUG_RE.match(candidate):
+            print(
+                f"Invalid slug. Must match {SLUG_RE.pattern}",
+                file=sys.stderr,
+            )
+            continue
+        slug = candidate
+    return slug
+
+
 def main(url: str) -> None:
     raise NotImplementedError
 

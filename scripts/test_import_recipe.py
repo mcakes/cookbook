@@ -177,3 +177,52 @@ def test_render_markdown_method_renumbers():
         make_recipe(instructions=["Step A", "Step B", "Step C"])
     )
     assert "1. Step A\n2. Step B\n3. Step C\n" in out
+
+
+import pytest
+
+
+def test_resolve_slug_no_collision(tmp_path):
+    assert import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path) == "beef-stew"
+
+
+def test_resolve_slug_with_collision(tmp_path, monkeypatch, capsys):
+    (tmp_path / "beef-stew.md").write_text("existing")
+    inputs = iter(["beef-bourguignon"])
+    monkeypatch.setattr("builtins.input", lambda: next(inputs))
+    result = import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
+    assert result == "beef-bourguignon"
+    err = capsys.readouterr().err
+    assert "already exists" in err
+
+
+def test_resolve_slug_reprompts_on_invalid(tmp_path, monkeypatch, capsys):
+    (tmp_path / "beef-stew.md").write_text("existing")
+    inputs = iter(["Beef Stew!", "beef-bourguignon"])
+    monkeypatch.setattr("builtins.input", lambda: next(inputs))
+    result = import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
+    assert result == "beef-bourguignon"
+    err = capsys.readouterr().err
+    assert "Invalid slug" in err
+
+
+def test_resolve_slug_reprompts_on_taken(tmp_path, monkeypatch):
+    (tmp_path / "beef-stew.md").write_text("existing")
+    (tmp_path / "beef-bourguignon.md").write_text("also existing")
+    inputs = iter(["beef-bourguignon", "boeuf"])
+    monkeypatch.setattr("builtins.input", lambda: next(inputs))
+    result = import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
+    assert result == "boeuf"
+
+
+def test_resolve_slug_aborts_on_eof(tmp_path, monkeypatch, capsys):
+    (tmp_path / "beef-stew.md").write_text("existing")
+
+    def raise_eof():
+        raise EOFError
+
+    monkeypatch.setattr("builtins.input", raise_eof)
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
+    assert exc.value.code == 2
+    assert "Aborted" in capsys.readouterr().err
