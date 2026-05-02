@@ -18,9 +18,7 @@ export default function RecipePage() {
   const { recipe, loading, error } = useRecipe(slug);
   const { authenticated } = useAuth();
   const { foods, mappings, loading: nutLoading, error: nutError } = useNutritionData();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // @ts-ignore -- editKey used in Task 15
-  const [editKey, setEditKey] = useState<string | null>(null);
+  const [, setEditKey] = useState<string | null>(null);
 
   if (loading) return <p className="text-muted">Loading recipe…</p>;
   if (error) return <p className="text-danger">Error: {error}</p>;
