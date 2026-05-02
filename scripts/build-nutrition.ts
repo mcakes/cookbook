@@ -93,7 +93,8 @@ function loadFdc(file: string): FdcFood[] {
   }
   const raw = JSON.parse(fs.readFileSync(file, "utf-8"));
   // FDC bulk JSON top-level key is "FoundationFoods" or "SRLegacyFoods"
-  return raw.FoundationFoods ?? raw.SRLegacyFoods ?? [];
+  const items: unknown[] = raw.FoundationFoods ?? raw.SRLegacyFoods ?? [];
+  return items.filter((x): x is FdcFood => x !== null && typeof x === "object");
 }
 
 function main() {
