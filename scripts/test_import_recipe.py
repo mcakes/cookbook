@@ -226,3 +226,123 @@ def test_resolve_slug_aborts_on_eof(tmp_path, monkeypatch, capsys):
         import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
     assert exc.value.code == 2
     assert "Aborted" in capsys.readouterr().err
+
+
+class FakeScraper:
+    def __init__(self, **values):
+        self._values = values
+
+    def title(self):
+        return self._values.get("title")
+
+    def yields(self):
+        return self._values.get("yields")
+
+    def prep_time(self):
+        return self._values.get("prep_time")
+
+    def cook_time(self):
+        return self._values.get("cook_time")
+
+    def image(self):
+        return self._values.get("image")
+
+    def ingredients(self):
+        return self._values.get("ingredients", [])
+
+    def instructions(self):
+        return self._values.get("instructions", "")
+
+
+class FakeResponse:
+    def __init__(self, text="<html></html>", status=200):
+        self.text = text
+        self.status_code = status
+
+    def raise_for_status(self):
+        if self.status_code >= 400:
+            import requests as _r
+            raise _r.HTTPError(f"HTTP {self.status_code}")
+
+
+def test_scrape_returns_normalized_dict(monkeypatch):
+    fake = FakeScraper(
+        title="Beef Stew",
+        yields="4 servings",
+        prep_time=15,
+        cook_time=90,
+        image="https://example.com/img.jpg",
+        ingredients=["1 lb beef"],
+        instructions="Brown beef.",
+    )
+    monkeypatch.setattr(import_recipe.requests, "get", lambda *a, **kw: FakeResponse())
+    monkeypatch.setattr(import_recipe, "scrape_html", lambda html, org_url, **kw: fake)
+    result = import_recipe.scrape("https://example.com/r")
+    assert result == {
+        "title": "Beef Stew",
+        "yields": "4 servings",
+        "prep_time": 15,
+        "cook_time": 90,
+        "image": "https://example.com/img.jpg",
+        "ingredients": ["1 lb beef"],
+        "instructions": "Brown beef.",
+    }
+
+
+def test_scrape_falls_back_to_wild_mode(monkeypatch):
+    from recipe_scrapers._exceptions import WebsiteNotImplementedError
+
+    fake = FakeScraper(title="Wild", ingredients=[], instructions="")
+    calls = []
+
+    def fake_scrape_html(html, org_url, **kw):
+        calls.append(kw)
+        if not kw.get("wild_mode"):
+            raise WebsiteNotImplementedError("unsupported")
+        return fake
+
+    monkeypatch.setattr(import_recipe.requests, "get", lambda *a, **kw: FakeResponse())
+    monkeypatch.setattr(import_recipe, "scrape_html", fake_scrape_html)
+    result = import_recipe.scrape("https://example.com/r")
+    assert result["title"] == "Wild"
+    assert calls[-1].get("wild_mode") is True
+
+
+def test_scrape_exits_1_on_unsupported_with_no_jsonld(monkeypatch, capsys):
+    from recipe_scrapers._exceptions import WebsiteNotImplementedError
+
+    def fake_scrape_html(html, org_url, **kw):
+        raise WebsiteNotImplementedError("unsupported")
+
+    monkeypatch.setattr(import_recipe.requests, "get", lambda *a, **kw: FakeResponse())
+    monkeypatch.setattr(import_recipe, "scrape_html", fake_scrape_html)
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.scrape("https://nope.example.com/r")
+    assert exc.value.code == 1
+    assert "nope.example.com" in capsys.readouterr().err
+
+
+def test_scrape_exits_1_on_network_error(monkeypatch, capsys):
+    import requests as requests_mod
+    def boom(*a, **kw):
+        raise requests_mod.ConnectionError("dns failure")
+
+    monkeypatch.setattr(import_recipe.requests, "get", boom)
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.scrape("https://example.com/r")
+    assert exc.value.code == 1
+    assert "could not fetch" in capsys.readouterr().err
+
+
+def test_scrape_swallows_per_field_errors(monkeypatch):
+    """If a scraper method raises (some sites don't have all fields), return None for that field."""
+    class AngryScraper(FakeScraper):
+        def prep_time(self):
+            raise ValueError("no prep time")
+
+    fake = AngryScraper(title="X", ingredients=[], instructions="")
+    monkeypatch.setattr(import_recipe.requests, "get", lambda *a, **kw: FakeResponse())
+    monkeypatch.setattr(import_recipe, "scrape_html", lambda html, org_url, **kw: fake)
+    result = import_recipe.scrape("https://example.com/r")
+    assert result["prep_time"] is None
+    assert result["title"] == "X"

@@ -11,6 +11,8 @@ from urllib.parse import urlparse
 
 import requests
 import yaml
+from recipe_scrapers import scrape_html
+from recipe_scrapers._exceptions import WebsiteNotImplementedError
 from slugify import slugify
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -151,6 +153,47 @@ def resolve_slug(slug: str, recipes_dir: Path = RECIPES_DIR) -> str:
             continue
         slug = candidate
     return slug
+
+
+def _safe_call(fn):
+    try:
+        return fn()
+    except Exception:
+        return None
+
+
+def scrape(url: str) -> dict:
+    try:
+        response = requests.get(
+            url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT}
+        )
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        print(f"Error: could not fetch {url}: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    try:
+        scraper = scrape_html(response.text, org_url=url)
+    except WebsiteNotImplementedError:
+        try:
+            scraper = scrape_html(response.text, org_url=url, wild_mode=True)
+        except Exception:
+            host = urlparse(url).netloc
+            print(
+                f"Error: {host} is not supported and has no parseable Recipe schema",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+
+    return {
+        "title": _safe_call(scraper.title),
+        "yields": _safe_call(scraper.yields),
+        "prep_time": _safe_call(scraper.prep_time),
+        "cook_time": _safe_call(scraper.cook_time),
+        "image": _safe_call(scraper.image),
+        "ingredients": _safe_call(scraper.ingredients) or [],
+        "instructions": _safe_call(scraper.instructions) or "",
+    }
 
 
 def main(url: str) -> None:
