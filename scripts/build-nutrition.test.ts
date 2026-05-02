@@ -28,6 +28,7 @@ const fixture = {
 describe("build-nutrition", () => {
   let foundationBackup: Buffer | null = null;
   let srBackup: Buffer | null = null;
+  let outDirBefore: Set<string> = new Set();
 
   beforeEach(() => {
     fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -37,6 +38,8 @@ describe("build-nutrition", () => {
     if (fs.existsSync(sPath)) srBackup = fs.readFileSync(sPath);
     fs.writeFileSync(fPath, JSON.stringify(fixture));
     fs.writeFileSync(sPath, JSON.stringify({ SRLegacyFoods: [] }));
+
+    outDirBefore = fs.existsSync(OUT_DIR) ? new Set(fs.readdirSync(OUT_DIR)) : new Set();
   });
 
   afterEach(() => {
@@ -46,6 +49,18 @@ describe("build-nutrition", () => {
     else fs.unlinkSync(fPath);
     if (srBackup) fs.writeFileSync(sPath, srBackup);
     else fs.unlinkSync(sPath);
+
+    if (fs.existsSync(OUT_DIR)) {
+      for (const name of fs.readdirSync(OUT_DIR)) {
+        if (!outDirBefore.has(name)) {
+          fs.unlinkSync(path.join(OUT_DIR, name));
+        }
+      }
+      // If we created the directory, remove it too
+      if (outDirBefore.size === 0 && fs.readdirSync(OUT_DIR).length === 0) {
+        fs.rmdirSync(OUT_DIR);
+      }
+    }
   });
 
   it("emits foods, index, and manifest", () => {

@@ -131,9 +131,10 @@ function main() {
   fs.writeFileSync(indexPath, JSON.stringify(index));
   fs.writeFileSync(manifestPath, JSON.stringify({ hash, foodsPath: `foods.${hash}.json`, indexPath: `foods.index.${hash}.json` }));
 
-  // Clean older artefacts
+  // Clean older artefacts (only files matching this script's own naming scheme)
+  const ARTEFACT_RE = /^foods(\.index)?\.[0-9a-f]{8}\.json$/;
   for (const f of fs.readdirSync(OUT_DIR)) {
-    if ((f.startsWith("foods.") && !f.includes(hash)) && f !== "manifest.json") {
+    if (ARTEFACT_RE.test(f) && !f.includes(hash)) {
       fs.unlinkSync(path.join(OUT_DIR, f));
     }
   }
