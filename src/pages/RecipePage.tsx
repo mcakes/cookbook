@@ -8,15 +8,23 @@ import CookLog from "../components/CookLog";
 import MarkdownPreview from "../components/MarkdownPreview";
 import { github } from "../lib/github-instance";
 import { ServingsProvider } from "../lib/servings-context";
+import NutritionPanel from "../components/NutritionPanel";
+import { useNutritionData } from "../hooks/useNutritionData";
+import { computeRecipeNutrition } from "../lib/nutrition";
 
 export default function RecipePage() {
   const { slug } = useParams<{ slug: string }>();
   const { recipe, loading, error } = useRecipe(slug);
   const { authenticated } = useAuth();
+  const { foods, mappings, loading: nutLoading, error: nutError } = useNutritionData();
 
   if (loading) return <p className="text-muted">Loading recipe…</p>;
   if (error) return <p className="text-danger">Error: {error}</p>;
   if (!recipe) return <p className="text-muted">Recipe not found.</p>;
+
+  const nutrition = recipe && foods
+    ? computeRecipeNutrition(recipe.ingredients, foods, mappings)
+    : null;
 
   return (
     <ServingsProvider baseServings={recipe.servings}>
@@ -53,6 +61,11 @@ export default function RecipePage() {
           <div className="ml-1"><StarRating rating={recipe.rating} /></div>
         )}
       </div>
+
+      {nutError && <p className="text-xs text-muted italic mb-4">Nutrition info unavailable</p>}
+      {nutrition && !nutLoading && (
+        <NutritionPanel rows={nutrition.rows} totals={nutrition.totals} />
+      )}
 
       {recipe.tags.length > 0 && (
         <div className="mb-10">
