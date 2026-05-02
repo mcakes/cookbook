@@ -22,7 +22,7 @@ USER_AGENT = (
     "Mozilla/5.0 (compatible; cookbook-import/1.0; "
     "+https://github.com/mcakes/cookbook)"
 )
-LEADING_NUMBER_RE = re.compile(r"^\s*\d+\s*[.)\-]\s*")
+LEADING_NUMBER_RE = re.compile(r"^\s*\d+\s*[.)\-](?!\d)\s*")
 REQUEST_TIMEOUT = 15
 
 
@@ -142,7 +142,7 @@ def resolve_slug(slug: str, recipes_dir: Path = RECIPES_DIR) -> str:
         )
         try:
             candidate = input().strip()
-        except EOFError:
+        except (EOFError, KeyboardInterrupt):
             print("Aborted.", file=sys.stderr)
             sys.exit(2)
         if not SLUG_RE.match(candidate):
@@ -211,7 +211,7 @@ def main(url: str) -> None:
         print("Warning: no instructions found in scrape", file=sys.stderr)
 
     recipe = build_recipe(scraped)
-    final_slug = resolve_slug(recipe["slug"])
+    final_slug = resolve_slug(recipe["slug"], recipes_dir=RECIPES_DIR)
     recipe["slug"] = final_slug
     content = render_markdown(recipe)
     output_path = RECIPES_DIR / f"{final_slug}.md"

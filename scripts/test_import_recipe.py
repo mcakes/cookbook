@@ -86,6 +86,14 @@ def test_build_recipe_strips_existing_numbering():
     assert result["instructions"] == ["Heat oil", "Add onion", "Sauté"]
 
 
+def test_build_recipe_preserves_decimal_numbers_in_instructions():
+    result = import_recipe.build_recipe(
+        {**FIXTURE_FULL, "instructions": "Add 1.5 cups flour\n2. Stir"},
+        today=date(2026, 5, 2),
+    )
+    assert result["instructions"] == ["Add 1.5 cups flour", "Stir"]
+
+
 def test_build_recipe_skips_blank_instruction_lines():
     result = import_recipe.build_recipe(
         {**FIXTURE_FULL, "instructions": "Heat oil\n\n  \nAdd onion"},
@@ -222,6 +230,19 @@ def test_resolve_slug_aborts_on_eof(tmp_path, monkeypatch, capsys):
         raise EOFError
 
     monkeypatch.setattr("builtins.input", raise_eof)
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
+    assert exc.value.code == 2
+    assert "Aborted" in capsys.readouterr().err
+
+
+def test_resolve_slug_aborts_on_keyboard_interrupt(tmp_path, monkeypatch, capsys):
+    (tmp_path / "beef-stew.md").write_text("existing")
+
+    def raise_kbd():
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("builtins.input", raise_kbd)
     with pytest.raises(SystemExit) as exc:
         import_recipe.resolve_slug("beef-stew", recipes_dir=tmp_path)
     assert exc.value.code == 2
