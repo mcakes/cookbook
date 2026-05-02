@@ -17,29 +17,31 @@ export default function IngredientList({ ingredients, baseServings }: Ingredient
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-3">
-        <h2 className="text-lg font-semibold">Ingredients</h2>
+      <div className="flex items-center justify-between gap-3 mb-4 pb-2 border-b border-line">
+        <h2 className="font-display text-lg font-medium text-ink">Ingredients</h2>
         {showScaler && (
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm text-muted">
             <button
               onClick={() => setServings(Math.max(1, servings - 1))}
-              className="w-7 h-7 rounded-full border flex items-center justify-center hover:bg-gray-100"
+              className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
+              aria-label="Fewer servings"
             >
-              -
+              −
             </button>
-            <span className="font-medium">{servings} servings</span>
+            <span className="text-ink tabular-nums">{servings} servings</span>
             <button
               onClick={() => setServings(servings + 1)}
-              className="w-7 h-7 rounded-full border flex items-center justify-center hover:bg-gray-100"
+              className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
+              aria-label="More servings"
             >
               +
             </button>
           </div>
         )}
       </div>
-      <ul className="space-y-1.5">
+      <ul className="space-y-2 text-sm leading-relaxed">
         {displayIngredients.map((ingredient, i) => (
-          <li key={i} className="text-gray-700 pl-4 border-l-2 border-gray-200">
+          <li key={i} className="text-ink">
             {ingredient}
           </li>
         ))}
