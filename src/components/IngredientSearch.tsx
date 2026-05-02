@@ -44,7 +44,7 @@ export default function IngredientSearch({
           {selected.map((ing) => (
             <span
               key={ing}
-              className="text-sm px-2 py-1 rounded-full bg-green-100 text-green-700 cursor-pointer hover:bg-red-100 hover:text-red-700"
+              className="text-sm px-2 py-1 rounded-full bg-tag text-accent cursor-pointer hover:bg-tag hover:text-danger"
               onClick={() => removeIngredient(ing)}
             >
               {ing} ×

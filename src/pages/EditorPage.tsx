@@ -146,7 +146,7 @@ export default function EditorPage() {
         </h1>
         <div className="flex gap-2">
           {!isNew && (
-            <button onClick={handleDelete} className="px-4 py-2 text-sm text-danger hover:text-red-800">
+            <button onClick={handleDelete} className="px-4 py-2 text-sm text-danger hover:text-danger">
               Delete
             </button>
           )}
@@ -161,7 +161,7 @@ export default function EditorPage() {
       </div>
 
       {saveError && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
+        <div className="bg-tag border border-line text-danger px-4 py-3 rounded-md mb-4">
           {saveError}
         </div>
       )}

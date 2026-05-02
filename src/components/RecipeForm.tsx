@@ -89,7 +89,7 @@ export default function RecipeForm({
         <label className="block text-sm font-medium text-ink mb-1">Tags</label>
         <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map((tag) => (
-            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 cursor-pointer hover:bg-red-100 hover:text-red-700" onClick={() => removeTag(tag)}>
+            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-tag text-tag-ink cursor-pointer hover:bg-tag hover:text-danger" onClick={() => removeTag(tag)}>
               {tag} ×
             </span>
           ))}
