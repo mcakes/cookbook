@@ -15,7 +15,7 @@ export default function ShoppingList({ items }: ShoppingListProps) {
   };
 
   if (items.length === 0) {
-    return <p className="text-gray-500 text-sm">Add recipes to generate a shopping list.</p>;
+    return <p className="text-muted text-sm">Add recipes to generate a shopping list.</p>;
   }
 
   return (
@@ -30,7 +30,7 @@ export default function ShoppingList({ items }: ShoppingListProps) {
               onChange={() => toggle(i)}
               className="rounded"
             />
-            <span className={checked.has(i) ? "line-through text-gray-400" : "text-gray-700"}>
+            <span className={checked.has(i) ? "line-through text-muted" : "text-ink"}>
               {item}
             </span>
           </li>

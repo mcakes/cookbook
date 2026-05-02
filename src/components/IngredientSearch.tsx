@@ -56,15 +56,15 @@ export default function IngredientSearch({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type an ingredient..."
-          className="w-full border rounded-md px-3 py-2"
+          className="w-full border border-line rounded-md px-3 py-2"
         />
         {suggestions.length > 0 && (
-          <div className="border rounded-md mt-1 max-h-48 overflow-y-auto">
+          <div className="border border-line rounded-md mt-1 max-h-48 overflow-y-auto">
             {suggestions.map((ing) => (
               <button
                 key={ing}
                 onClick={() => addIngredient(ing)}
-                className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
+                className="block w-full text-left px-3 py-2 text-sm hover:bg-tag"
               >
                 {ing}
               </button>
@@ -79,17 +79,17 @@ export default function IngredientSearch({
             <Link
               key={r.slug}
               to={`/recipe/${r.slug}`}
-              className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md"
+              className="block p-4 bg-paper rounded-lg shadow-sm hover:shadow-md"
             >
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold">{r.title}</h3>
-                  <p className="text-sm text-green-600 mt-1">
+                  <p className="text-sm text-accent mt-1">
                     {r.matchCount} ingredient{r.matchCount !== 1 ? "s" : ""} matched
                   </p>
                 </div>
                 {r.missing.length > 0 && (
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted">
                     Missing: {r.missing.slice(0, 3).join(", ")}
                     {r.missing.length > 3 && ` +${r.missing.length - 3} more`}
                   </p>

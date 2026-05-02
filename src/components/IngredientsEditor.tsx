@@ -18,7 +18,7 @@ export default function IngredientsEditor({ ingredients, onChange }: Ingredients
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-ink mb-2">
         Ingredients
       </label>
       <div className="space-y-2">
@@ -29,12 +29,12 @@ export default function IngredientsEditor({ ingredients, onChange }: Ingredients
               value={ingredient}
               onChange={(e) => updateLine(i, e.target.value)}
               placeholder="e.g. 200g pasta"
-              className="flex-1 border rounded-md px-3 py-1.5 text-sm"
+              className="flex-1 border border-line rounded-md px-3 py-1.5 text-sm"
             />
             <button
               type="button"
               onClick={() => removeLine(i)}
-              className="text-red-400 hover:text-red-600 px-2"
+              className="text-danger hover:text-danger px-2"
             >
               ×
             </button>
@@ -44,7 +44,7 @@ export default function IngredientsEditor({ ingredients, onChange }: Ingredients
       <button
         type="button"
         onClick={addLine}
-        className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+        className="mt-2 text-sm text-accent hover:text-ink"
       >
         + Add ingredient
       </button>

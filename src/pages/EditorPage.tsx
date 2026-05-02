@@ -79,11 +79,11 @@ export default function EditorPage() {
   };
 
   if (!authenticated) {
-    return <p className="text-gray-500">You must be logged in to edit recipes.</p>;
+    return <p className="text-muted">You must be logged in to edit recipes.</p>;
   }
 
   if (!isNew && loading) {
-    return <p className="text-gray-500">Loading recipe...</p>;
+    return <p className="text-muted">Loading recipe...</p>;
   }
 
   const handleSave = async () => {
@@ -146,14 +146,14 @@ export default function EditorPage() {
         </h1>
         <div className="flex gap-2">
           {!isNew && (
-            <button onClick={handleDelete} className="px-4 py-2 text-sm text-red-600 hover:text-red-800">
+            <button onClick={handleDelete} className="px-4 py-2 text-sm text-danger hover:text-red-800">
               Delete
             </button>
           )}
           <button
             onClick={handleSave}
             disabled={saving || !title.trim()}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>
@@ -168,12 +168,12 @@ export default function EditorPage() {
 
       <div className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+          <label className="block text-sm font-medium text-ink mb-1">Image</label>
           {image && (
             <img src={github.imageUrl(image)} alt="Recipe" className="w-48 h-32 object-cover rounded-md mb-2" />
           )}
           <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="text-sm" />
-          {uploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
+          {uploading && <p className="text-sm text-muted mt-1">Uploading...</p>}
         </div>
 
         <RecipeForm
@@ -187,7 +187,7 @@ export default function EditorPage() {
         <IngredientsEditor ingredients={ingredients} onChange={setIngredients} />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-ink mb-2">
             Method & Notes (Markdown)
           </label>
           <div data-color-mode="light">

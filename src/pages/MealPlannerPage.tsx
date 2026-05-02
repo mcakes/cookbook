@@ -68,30 +68,30 @@ export default function MealPlannerPage() {
     ? index.filter((r) => r.title.toLowerCase().includes(searchQuery.toLowerCase()))
     : index;
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-muted">Loading...</p>;
 
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold">Meal Planner</h1>
-        <button onClick={handleClear} className="text-sm text-gray-500 hover:text-red-600">
+        <button onClick={handleClear} className="text-sm text-muted hover:text-danger">
           Clear week
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-2 mb-8">
         {DAYS.map((day) => (
-          <div key={day} className="bg-white rounded-lg p-3 shadow-sm min-h-[120px]">
-            <h3 className="font-semibold text-sm text-gray-500 mb-2">{DAY_LABELS[day]}</h3>
+          <div key={day} className="bg-paper rounded-lg p-3 shadow-sm min-h-[120px]">
+            <h3 className="font-semibold text-sm text-muted mb-2">{DAY_LABELS[day]}</h3>
             <div className="space-y-1">
               {plan.days[day].map((slug, i) => (
                 <div key={i} className="text-xs flex justify-between items-start group">
-                  <Link to={`/recipe/${slug}`} className="text-blue-600 hover:underline">
+                  <Link to={`/recipe/${slug}`} className="text-accent hover:underline">
                     {recipeMap.get(slug) ?? slug}
                   </Link>
                   <button
                     onClick={() => removeRecipe(day, i)}
-                    className="text-gray-300 group-hover:text-red-400 ml-1"
+                    className="text-muted group-hover:text-danger ml-1"
                   >
                     ×
                   </button>
@@ -100,7 +100,7 @@ export default function MealPlannerPage() {
             </div>
             <button
               onClick={() => setAddingTo(addingTo === day ? null : day)}
-              className="text-xs text-blue-500 hover:text-blue-700 mt-2"
+              className="text-xs text-accent hover:text-accent-hover mt-2"
             >
               + Add
             </button>
@@ -111,7 +111,7 @@ export default function MealPlannerPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-full border rounded px-2 py-1 text-xs"
+                  className="w-full border border-line rounded px-2 py-1 text-xs"
                   autoFocus
                 />
                 <div className="max-h-32 overflow-y-auto mt-1">
@@ -119,7 +119,7 @@ export default function MealPlannerPage() {
                     <button
                       key={r.slug}
                       onClick={() => addRecipe(day, r.slug)}
-                      className="block w-full text-left text-xs px-2 py-1 hover:bg-gray-100"
+                      className="block w-full text-left text-xs px-2 py-1 hover:bg-tag"
                     >
                       {r.title}
                     </button>
