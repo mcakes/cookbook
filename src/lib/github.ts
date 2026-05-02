@@ -123,4 +123,51 @@ export class GitHubClient {
   imageUrl(filename: string): string {
     return `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/images/${filename}`;
   }
+
+  async fetchMappings(): Promise<{ content: Record<string, unknown>; sha: string | null }> {
+    // Try the static file first (works for unauthenticated viewers).
+    const res = await fetch(`/data/nutrition-mappings.json`);
+    if (res.ok) {
+      const content = await res.json();
+      return { content, sha: null };
+    }
+    return { content: {}, sha: null };
+  }
+
+  async fetchMappingsViaApi(token: string): Promise<{ content: Record<string, unknown>; sha: string }> {
+    const res = await fetch(
+      `${API_BASE}/repos/${this.owner}/${this.repo}/contents/public/data/nutrition-mappings.json`,
+      { headers: { Authorization: `Bearer ${token}`, Accept: "application/vnd.github.v3+json" } }
+    );
+    if (!res.ok) throw new Error(`Failed to fetch mappings: ${res.status}`);
+    const data = await res.json();
+    const decoded = atob(data.content.replace(/\n/g, ""));
+    return { content: JSON.parse(decoded), sha: data.sha };
+  }
+
+  async saveMappings(
+    mappings: Record<string, unknown>,
+    token: string,
+    sha?: string
+  ): Promise<string> {
+    const body: Record<string, string> = {
+      message: "chore: update nutrition mappings",
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(mappings, null, 2) + "\n"))),
+    };
+    if (sha) body.sha = sha;
+    const res = await fetch(
+      `${API_BASE}/repos/${this.owner}/${this.repo}/contents/public/data/nutrition-mappings.json`,
+      {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    );
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Failed to save mappings: ${res.status} ${err}`);
+    }
+    const data = await res.json();
+    return data.content.sha;
+  }
 }
