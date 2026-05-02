@@ -33,7 +33,7 @@ updated: '2026-05-02'
 
 1. In a 2-cup liquid measuring cup or small bowl, whisk olive oil, vinegar, wine or chicken broth, garlic, brown sugar, and oregano to combine.
 2. In a large bowl, combine chicken thighs with olives, prunes, and oil mixture. Season evenly with salt and pepper and let sit, refrigerated, for at least 1 hour or up to 8 hours.
-3. 30 minutes before cooking, adjust oven rack to middle position and preheat oven to 425°F (220°C).
+3. 30 minutes before cooking, adjust oven rack to middle position and preheat oven to 425F (220C).
 4. Remove chicken from marinade and arrange on a 13-by-18-inch rimmed baking sheet. Scatter olives and prunes around chicken, and pour marinade over chicken, olives, and prunes.
-5. Roast chicken until it sizzles and begins to take on color, about 20 minutes. Using a large spoon or baster, baste chicken, olives, and prunes with pan juices. Continue cooking until chicken is deep golden brown, cooked through, and registers 185°F (85°C) on an instant-read thermometer, 15 to 20 more minutes.
+5. Roast chicken until it sizzles and begins to take on color, about 20 minutes. Using a large spoon or baster, baste chicken, olives, and prunes with pan juices. Continue cooking until chicken is deep golden brown, cooked through, and registers 185F (85C) on an instant-read thermometer, 15 to 20 more minutes.
 6. Remove chicken, olives, and prune to a large serving plate or platter. Add water to baking sheet and, using a metal spatula, such as a fish spatula, stir and scrape up any browned bits on the pan. Carefully pour sauce into a small bowl. Serve chicken with rice or couscous and pan sauce.
