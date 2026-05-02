@@ -24,6 +24,19 @@ LEADING_NUMBER_RE = re.compile(r"^\s*\d+\s*[.)\-]\s*")
 REQUEST_TIMEOUT = 15
 
 
+class _PrettyDumper(yaml.SafeDumper):
+    """Custom YAML dumper with 2-space indentation for nested lists."""
+
+    pass
+
+
+def _increase_indent(self, flow=False, indentless=False):
+    return super(_PrettyDumper, self).increase_indent(flow, False)
+
+
+_PrettyDumper.increase_indent = _increase_indent
+
+
 def _parse_servings(yields) -> int | None:
     if yields is None:
         return None
@@ -74,6 +87,54 @@ def build_recipe(scraped: dict, today: date | None = None) -> dict:
     recipe["updated"] = today_str
     recipe["instructions"] = _parse_instructions(scraped.get("instructions"))
     return recipe
+
+
+_FRONTMATTER_ORDER_PRE_RATING = ["title", "slug", "tags"]
+_FRONTMATTER_ORDER_POST_RATING = [
+    "servings",
+    "prep_time",
+    "cook_time",
+    "image",
+    "ingredients",
+    "cook_log",
+    "created",
+    "updated",
+]
+
+
+def _dump_yaml_section(data: dict) -> str:
+    if not data:
+        return ""
+    return yaml.dump(
+        data,
+        Dumper=_PrettyDumper,
+        default_flow_style=False,
+        sort_keys=False,
+        allow_unicode=True,
+    )
+
+
+def render_markdown(recipe: dict) -> str:
+    pre = {k: recipe[k] for k in _FRONTMATTER_ORDER_PRE_RATING if k in recipe}
+    post = {k: recipe[k] for k in _FRONTMATTER_ORDER_POST_RATING if k in recipe}
+
+    pre_yaml = _dump_yaml_section(pre)
+    post_yaml = _dump_yaml_section(post)
+
+    method_lines = "\n".join(
+        f"{i + 1}. {step}" for i, step in enumerate(recipe.get("instructions", []))
+    )
+    method_section = f"## Method\n\n{method_lines}\n" if method_lines else "## Method\n"
+
+    return (
+        "---\n"
+        f"{pre_yaml}"
+        "rating:\n"
+        f"{post_yaml}"
+        "---\n"
+        "\n"
+        f"{method_section}"
+    )
 
 
 def main(url: str) -> None:

@@ -103,3 +103,77 @@ def test_build_recipe_exits_on_missing_title(capsys):
         )
     assert exc.value.code == 1
     assert "no title" in capsys.readouterr().err
+
+
+def make_recipe(**overrides):
+    base = {
+        "title": "Beef Stew",
+        "slug": "beef-stew",
+        "tags": [],
+        "servings": 4,
+        "prep_time": 15,
+        "cook_time": 90,
+        "image": "https://example.com/img.jpg",
+        "ingredients": ["1 lb beef", "2 carrots"],
+        "cook_log": [],
+        "created": "2026-05-02",
+        "updated": "2026-05-02",
+        "instructions": ["Brown beef.", "Add vegetables."],
+    }
+    base.update(overrides)
+    return base
+
+
+def test_render_markdown_full():
+    out = import_recipe.render_markdown(make_recipe())
+    expected = (
+        "---\n"
+        "title: Beef Stew\n"
+        "slug: beef-stew\n"
+        "tags: []\n"
+        "rating:\n"
+        "servings: 4\n"
+        "prep_time: 15\n"
+        "cook_time: 90\n"
+        "image: https://example.com/img.jpg\n"
+        "ingredients:\n"
+        "  - 1 lb beef\n"
+        "  - 2 carrots\n"
+        "cook_log: []\n"
+        "created: '2026-05-02'\n"
+        "updated: '2026-05-02'\n"
+        "---\n"
+        "\n"
+        "## Method\n"
+        "\n"
+        "1. Brown beef.\n"
+        "2. Add vegetables.\n"
+    )
+    assert out == expected
+
+
+def test_render_markdown_omits_optional_fields():
+    recipe = make_recipe()
+    for key in ("servings", "prep_time", "cook_time", "image"):
+        del recipe[key]
+    out = import_recipe.render_markdown(recipe)
+    for key in ("servings:", "prep_time:", "cook_time:", "image:"):
+        assert key not in out, f"{key} should not appear"
+    # Required fields still present
+    assert "title: Beef Stew\n" in out
+    assert "rating:\n" in out
+    assert "ingredients:\n" in out
+
+
+def test_render_markdown_rating_has_no_value():
+    out = import_recipe.render_markdown(make_recipe())
+    assert "\nrating:\n" in out
+    assert "rating: null" not in out
+    assert "rating: ~" not in out
+
+
+def test_render_markdown_method_renumbers():
+    out = import_recipe.render_markdown(
+        make_recipe(instructions=["Step A", "Step B", "Step C"])
+    )
+    assert "1. Step A\n2. Step B\n3. Step C\n" in out
