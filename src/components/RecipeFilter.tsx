@@ -44,31 +44,47 @@ export default function RecipeFilter({
   onTagChange,
   onSortChange,
 }: RecipeFilterProps) {
-  return (
-    <div className="flex flex-wrap items-center gap-4 mb-6">
-      <select
-        value={selectedTag ?? ""}
-        onChange={(e) => onTagChange(e.target.value || null)}
-        className="border rounded-md px-3 py-1.5 text-sm"
-      >
-        <option value="">All tags</option>
-        {allTags.map((tag) => (
-          <option key={tag} value={tag}>
-            {tag}
-          </option>
-        ))}
-      </select>
+  const chipBase =
+    "rounded-full px-3 py-1 text-xs tracking-wide border transition-colors";
+  const inactive =
+    "bg-paper border-line text-muted hover:text-ink";
+  const active =
+    "bg-accent border-accent text-paper";
 
-      <select
-        value={sortBy}
-        onChange={(e) => onSortChange(e.target.value as SortOption)}
-        className="border rounded-md px-3 py-1.5 text-sm"
-      >
-        <option value="recent">Recently cooked</option>
-        <option value="rating">Highest rated</option>
-        <option value="newest">Newest</option>
-        <option value="alpha">A-Z</option>
-      </select>
+  return (
+    <div className="flex flex-wrap items-center gap-3 mb-6">
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={() => onTagChange(null)}
+          className={`${chipBase} ${selectedTag === null ? active : inactive}`}
+        >
+          All
+        </button>
+        {allTags.map((tag) => (
+          <button
+            key={tag}
+            type="button"
+            onClick={() => onTagChange(tag)}
+            className={`${chipBase} ${selectedTag === tag ? active : inactive}`}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+
+      <div className="ml-auto">
+        <select
+          value={sortBy}
+          onChange={(e) => onSortChange(e.target.value as SortOption)}
+          className="bg-paper border border-line rounded px-3 py-1.5 text-sm text-ink"
+        >
+          <option value="recent">Recently cooked</option>
+          <option value="rating">Highest rated</option>
+          <option value="newest">Newest</option>
+          <option value="alpha">A–Z</option>
+        </select>
+      </div>
     </div>
   );
 }
