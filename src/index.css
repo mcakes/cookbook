@@ -27,4 +27,27 @@
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
   }
+
+  [data-color-mode="light"],
+  [data-color-mode="light"] .w-md-editor {
+    --color-canvas-default: var(--color-paper);
+    --color-canvas-subtle: var(--color-bg);
+    --color-border-default: var(--color-line);
+    --color-border-muted: var(--color-line);
+    --color-fg-default: var(--color-ink);
+    --color-fg-muted: var(--color-muted);
+    --color-fg-subtle: var(--color-muted);
+    --color-accent-fg: var(--color-accent);
+    --color-accent-emphasis: var(--color-accent);
+    --color-neutral-muted: var(--color-tag);
+  }
+}
+
+[data-color-mode="light"] .w-md-editor,
+[data-color-mode="light"] .w-md-editor-text,
+[data-color-mode="light"] .w-md-editor-text-pre,
+[data-color-mode="light"] .w-md-editor-preview,
+[data-color-mode="light"] .wmde-markdown {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
 }
