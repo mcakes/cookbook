@@ -1,22 +1,49 @@
 [
   {
-    "title": "Example Recipe",
-    "slug": "example-recipe",
+    "title": "Chicken Enchiladas Verde",
+    "slug": "chicken-enchiladas-verde",
     "tags": [
-      "example",
-      "test"
+      "mexican",
+      "chicken",
+      "enchiladas",
+      "verde"
     ],
-    "rating": 3,
+    "rating": 4,
     "servings": 2,
-    "prep_time": 10,
-    "cook_time": 20,
+    "prep_time": 20,
+    "cook_time": 60,
     "ingredients": [
-      "200g pasta",
-      "100g cheese",
-      "1 clove garlic"
+      "1 whole chicken",
+      "2 bay leaves",
+      "2 white onions",
+      "2 cobs of corn",
+      "5 cloves garlic",
+      "2 lbs tomatillos",
+      "2 Jalapeno peppers",
+      "2 Serrano peppers",
+      "1 bunch cilantro",
+      "Corn or flour tortillas"
     ],
     "cook_log": [],
-    "created": "2026-04-06",
-    "updated": "2026-04-06"
+    "created": "2026-04-11",
+    "updated": "2026-05-02"
+  },
+  {
+    "title": "Tacos",
+    "slug": "tacos",
+    "tags": [
+      "spicy"
+    ],
+    "rating": 4,
+    "servings": 1,
+    "prep_time": 1,
+    "cook_time": 1,
+    "ingredients": [
+      "100g squid",
+      "1 large onion"
+    ],
+    "cook_log": [],
+    "created": "2026-04-07",
+    "updated": "2026-04-07"
   }
 ]

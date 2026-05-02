@@ -77,7 +77,7 @@ export default function RecipeFilter({
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value as SortOption)}
-          className="bg-paper border border-line rounded px-3 py-1.5 text-sm text-ink"
+          className="bg-field border border-line rounded px-3 py-1.5 text-sm text-ink"
         >
           <option value="recent">Recently cooked</option>
           <option value="rating">Highest rated</option>

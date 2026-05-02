@@ -111,7 +111,7 @@ export default function MealPlannerPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-full border border-line rounded px-2 py-1 text-xs"
+                  className="w-full bg-field border border-line rounded px-2 py-1 text-xs"
                   autoFocus
                 />
                 <div className="max-h-32 overflow-y-auto mt-1">

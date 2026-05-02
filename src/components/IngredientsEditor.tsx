@@ -29,7 +29,7 @@ export default function IngredientsEditor({ ingredients, onChange }: Ingredients
               value={ingredient}
               onChange={(e) => updateLine(i, e.target.value)}
               placeholder="e.g. 200g pasta"
-              className="flex-1 border border-line rounded-md px-3 py-1.5 text-sm"
+              className="flex-1 bg-field border border-line rounded-md px-3 py-1.5 text-sm"
             />
             <button
               type="button"

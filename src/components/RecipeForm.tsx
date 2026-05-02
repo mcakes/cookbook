@@ -60,7 +60,7 @@ export default function RecipeForm({
           type="text"
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
-          className="w-full border border-line rounded-md px-3 py-2"
+          className="w-full bg-field border border-line rounded-md px-3 py-2"
           placeholder="Recipe title"
         />
       </div>
@@ -73,15 +73,15 @@ export default function RecipeForm({
       <div className="grid grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-ink mb-1">Servings</label>
-          <input type="number" value={servings ?? ""} onChange={(e) => onServingsChange(parseNum(e.target.value))} className="w-full border border-line rounded-md px-3 py-2" min={1} />
+          <input type="number" value={servings ?? ""} onChange={(e) => onServingsChange(parseNum(e.target.value))} className="w-full bg-field border border-line rounded-md px-3 py-2" min={1} />
         </div>
         <div>
           <label className="block text-sm font-medium text-ink mb-1">Prep (min)</label>
-          <input type="number" value={prepTime ?? ""} onChange={(e) => onPrepTimeChange(parseNum(e.target.value))} className="w-full border border-line rounded-md px-3 py-2" min={0} />
+          <input type="number" value={prepTime ?? ""} onChange={(e) => onPrepTimeChange(parseNum(e.target.value))} className="w-full bg-field border border-line rounded-md px-3 py-2" min={0} />
         </div>
         <div>
           <label className="block text-sm font-medium text-ink mb-1">Cook (min)</label>
-          <input type="number" value={cookTime ?? ""} onChange={(e) => onCookTimeChange(parseNum(e.target.value))} className="w-full border border-line rounded-md px-3 py-2" min={0} />
+          <input type="number" value={cookTime ?? ""} onChange={(e) => onCookTimeChange(parseNum(e.target.value))} className="w-full bg-field border border-line rounded-md px-3 py-2" min={0} />
         </div>
       </div>
 
@@ -95,7 +95,7 @@ export default function RecipeForm({
           ))}
         </div>
         <div className="flex gap-2">
-          <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} placeholder="Add a tag..." className="flex-1 border border-line rounded-md px-3 py-1.5 text-sm" />
+          <input type="text" value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())} placeholder="Add a tag..." className="flex-1 bg-field border border-line rounded-md px-3 py-1.5 text-sm" />
           <button type="button" onClick={addTag} className="text-sm text-accent hover:text-ink px-2">Add</button>
         </div>
       </div>
@@ -103,8 +103,8 @@ export default function RecipeForm({
       <div>
         <label className="block text-sm font-medium text-ink mb-1">Cook Log</label>
         <div className="flex gap-2 mb-2">
-          <input type="date" value={newLogDate} onChange={(e) => setNewLogDate(e.target.value)} className="border border-line rounded-md px-3 py-1.5 text-sm" />
-          <input type="text" value={newLogNotes} onChange={(e) => setNewLogNotes(e.target.value)} placeholder="Notes (optional)" className="flex-1 border border-line rounded-md px-3 py-1.5 text-sm" />
+          <input type="date" value={newLogDate} onChange={(e) => setNewLogDate(e.target.value)} className="bg-field border border-line rounded-md px-3 py-1.5 text-sm" />
+          <input type="text" value={newLogNotes} onChange={(e) => setNewLogNotes(e.target.value)} placeholder="Notes (optional)" className="flex-1 bg-field border border-line rounded-md px-3 py-1.5 text-sm" />
           <button type="button" onClick={addCookLogEntry} className="text-sm bg-tag hover:bg-line px-3 py-1.5 rounded-md">Log</button>
         </div>
         {cookLog.length > 0 && (

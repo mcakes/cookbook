@@ -56,7 +56,7 @@ export default function IngredientSearch({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type an ingredient..."
-          className="w-full border border-line rounded-md px-3 py-2"
+          className="w-full bg-field border border-line rounded-md px-3 py-2"
         />
         {suggestions.length > 0 && (
           <div className="border border-line rounded-md mt-1 max-h-48 overflow-y-auto">
