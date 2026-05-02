@@ -153,7 +153,7 @@ export default function EditorPage() {
           <button
             onClick={handleSave}
             disabled={saving || !title.trim()}
-            className="px-4 py-2 text-sm bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50"
+            className="px-4 py-2 text-sm bg-accent text-paper rounded-md hover:bg-accent-hover disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save"}
           </button>

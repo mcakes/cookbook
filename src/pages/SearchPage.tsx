@@ -35,27 +35,27 @@ export default function SearchPage() {
     return Array.from(set).sort();
   }, [index]);
 
-  if (loading) return <p className="text-gray-500">Loading...</p>;
+  if (loading) return <p className="text-muted">Loading…</p>;
 
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex gap-4 mb-6">
         <button
           onClick={() => setMode("text")}
-          className={`px-4 py-2 rounded-md text-sm font-medium ${
+          className={`px-4 py-2 rounded text-sm transition-colors ${
             mode === "text"
-              ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-accent text-paper"
+              : "bg-paper text-muted border border-line hover:text-ink"
           }`}
         >
           Text Search
         </button>
         <button
           onClick={() => setMode("ingredient")}
-          className={`px-4 py-2 rounded-md text-sm font-medium ${
+          className={`px-4 py-2 rounded text-sm transition-colors ${
             mode === "ingredient"
-              ? "bg-green-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-accent text-paper"
+              : "bg-paper text-muted border border-line hover:text-ink"
           }`}
         >
           By Ingredient
@@ -71,10 +71,10 @@ export default function SearchPage() {
                 <Link
                   key={r.slug}
                   to={`/recipe/${r.slug}`}
-                  className="block p-4 bg-white rounded-lg shadow-sm hover:shadow-md"
+                  className="block p-4 bg-paper rounded-md border border-line transition-all hover:-translate-y-0.5 hover:shadow-sm"
                 >
-                  <h3 className="font-semibold">{r.title}</h3>
-                  <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                  <h3 className="font-display text-lg font-medium text-ink">{r.title}</h3>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-muted">
                     {r.rating !== undefined && <StarRating rating={r.rating} />}
                     <span>{r.tags.join(", ")}</span>
                   </div>
@@ -83,7 +83,7 @@ export default function SearchPage() {
             </div>
           )}
           {query && textResults.length === 0 && (
-            <p className="text-gray-500 mt-4">No results for "{query}"</p>
+            <p className="text-muted mt-4">No results for "{query}"</p>
           )}
         </div>
       ) : (
