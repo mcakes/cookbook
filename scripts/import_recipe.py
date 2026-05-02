@@ -198,8 +198,29 @@ def scrape(url: str) -> dict:
     }
 
 
+def write_file(path: Path, content: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
 def main(url: str) -> None:
-    raise NotImplementedError
+    scraped = scrape(url)
+    if not scraped.get("ingredients"):
+        print("Warning: no ingredients found in scrape", file=sys.stderr)
+    if not scraped.get("instructions"):
+        print("Warning: no instructions found in scrape", file=sys.stderr)
+
+    recipe = build_recipe(scraped)
+    final_slug = resolve_slug(recipe["slug"])
+    recipe["slug"] = final_slug
+    content = render_markdown(recipe)
+    output_path = RECIPES_DIR / f"{final_slug}.md"
+    write_file(output_path, content)
+    try:
+        rel = output_path.relative_to(REPO_ROOT)
+    except ValueError:
+        rel = output_path
+    print(str(rel))
 
 
 if __name__ == "__main__":

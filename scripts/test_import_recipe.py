@@ -346,3 +346,56 @@ def test_scrape_swallows_per_field_errors(monkeypatch):
     result = import_recipe.scrape("https://example.com/r")
     assert result["prep_time"] is None
     assert result["title"] == "X"
+
+
+def _patch_main_environment(monkeypatch, tmp_path, fake_scraped):
+    """Wire up monkeypatches so main() runs against tmp_path with deterministic dates."""
+    monkeypatch.setattr(import_recipe, "scrape", lambda url: fake_scraped)
+    monkeypatch.setattr(import_recipe, "RECIPES_DIR", tmp_path)
+    monkeypatch.setattr(import_recipe, "REPO_ROOT", tmp_path.parent)
+
+    # Pin date.today() so created/updated values are deterministic.
+    class _FixedDate(date):
+        @classmethod
+        def today(cls):
+            return date(2026, 5, 2)
+
+    monkeypatch.setattr(import_recipe, "date", _FixedDate)
+
+
+def test_main_end_to_end(monkeypatch, tmp_path, capsys):
+    """main() writes a markdown file and prints its relative path."""
+    fake_scraped = {
+        "title": "Test Stew",
+        "yields": "2",
+        "prep_time": 5,
+        "cook_time": 10,
+        "image": None,
+        "ingredients": ["water"],
+        "instructions": "Boil water.",
+    }
+    _patch_main_environment(monkeypatch, tmp_path, fake_scraped)
+    import_recipe.main("https://example.com/r")
+    out_file = tmp_path / "test-stew.md"
+    assert out_file.exists()
+    content = out_file.read_text()
+    assert "title: Test Stew" in content
+    assert "## Method" in content
+    assert "1. Boil water." in content
+    assert "created: '2026-05-02'" in content
+
+
+def test_main_warns_on_missing_ingredients(monkeypatch, tmp_path, capsys):
+    fake_scraped = {
+        "title": "Empty",
+        "yields": None,
+        "prep_time": None,
+        "cook_time": None,
+        "image": None,
+        "ingredients": [],
+        "instructions": "Step 1.",
+    }
+    _patch_main_environment(monkeypatch, tmp_path, fake_scraped)
+    import_recipe.main("https://example.com/r")
+    err = capsys.readouterr().err
+    assert "no ingredients" in err.lower()
