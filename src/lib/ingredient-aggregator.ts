@@ -1,7 +1,33 @@
+const QUANTITY_RE = /^(\d+(?:\.\d+)?)\s+(.+)$/;
+
+function parse(ingredient: string): { quantity: number | null; rest: string; original: string } {
+  const trimmed = ingredient.trim();
+  const match = trimmed.match(QUANTITY_RE);
+  if (match) {
+    return { quantity: Number(match[1]), rest: match[2], original: trimmed };
+  }
+  return { quantity: null, rest: trimmed, original: trimmed };
+}
+
+function stripPlural(word: string): string {
+  if (word.endsWith("es") && word.length > 2) return word.slice(0, -2);
+  if (word.endsWith("s") && word.length > 1) return word.slice(0, -1);
+  return word;
+}
+
+function keyFor(rest: string): string {
+  return rest
+    .toLowerCase()
+    .split(/\s+/)
+    .filter((w) => w.length > 0)
+    .map(stripPlural)
+    .join(" ");
+}
+
 export function aggregateIngredients(ingredients: string[]): string[] {
   type Group = {
-    rest: string;
-    original: string;
+    firstRest: string;
+    firstOriginal: string;
     numericTotal: number;
     numericCount: number;
     nonNumericCount: number;
@@ -11,32 +37,14 @@ export function aggregateIngredients(ingredients: string[]): string[] {
   const order: string[] = [];
 
   for (const raw of ingredients) {
-    const original = raw.trim();
-    if (original === "") continue;
-
-    const match = original.match(/^(\d+(?:\.\d+)?)\s+(.+)$/);
-    let quantity: number | null;
-    let rest: string;
-    if (match) {
-      quantity = Number(match[1]);
-      rest = match[2];
-    } else {
-      quantity = null;
-      rest = original;
-    }
-
-    const key = rest
-      .toLowerCase()
-      .split(/\s+/)
-      .filter((w) => w.length > 0)
-      .map((w) => w.replace(/(es|s)$/, ""))
-      .join(" ");
+    const { quantity, rest, original } = parse(raw);
+    const key = keyFor(rest);
 
     let group = groups.get(key);
     if (!group) {
       group = {
-        rest,
-        original,
+        firstRest: rest,
+        firstOriginal: original,
         numericTotal: 0,
         numericCount: 0,
         nonNumericCount: 0,
@@ -54,14 +62,14 @@ export function aggregateIngredients(ingredients: string[]): string[] {
   }
 
   return order.map((key) => {
-    const g = groups.get(key)!;
-    if (g.numericCount > 0) {
-      const total = g.numericTotal + g.nonNumericCount;
-      return `${total} ${g.rest}`;
+    const group = groups.get(key)!;
+    if (group.numericCount > 0) {
+      const total = group.numericTotal + group.nonNumericCount;
+      return `${total} ${group.firstRest}`;
     }
-    if (g.nonNumericCount > 1) {
-      return `${g.original} ×${g.nonNumericCount}`;
+    if (group.nonNumericCount > 1) {
+      return `${group.firstOriginal} ×${group.nonNumericCount}`;
     }
-    return g.original;
+    return group.firstOriginal;
   });
 }
