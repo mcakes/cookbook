@@ -12,7 +12,7 @@ export default function IngredientList({ ingredients, baseServings }: Ingredient
 
   const displayIngredients =
     showScaler && servings !== baseServings
-      ? scaleIngredients(ingredients, servings, baseServings!)
+      ? scaleIngredients(ingredients, baseServings!, servings)
       : ingredients;
 
   return (
