@@ -48,7 +48,7 @@ export default function RecipePage() {
         {recipe.prep_time && <span>Prep {recipe.prep_time}m</span>}
         {recipe.cook_time && <span>Cook {recipe.cook_time}m</span>}
         {recipe.rating !== undefined && (
-          <span className="ml-1"><StarRating rating={recipe.rating} /></span>
+          <div className="ml-1"><StarRating rating={recipe.rating} /></div>
         )}
       </div>
 
