@@ -1,25 +1,29 @@
 ---
 title: Sheet-Pan Chicken Marbella
 slug: sheet-pan-chicken-marbella
-tags: []
-rating:
+tags:
+  - chicken
+  - sweet & briny
+rating: 5
 servings: 6
-prep_time: 7
+prep_time: 60
 cook_time: 40
 ingredients:
   - 1/4 cup (60 ml) extra-virgin olive oil
   - 1/4 cup (60 ml) red wine vinegar
   - 1/4 cup (60 ml) dry white wine or low-sodium chicken broth
-  - 3 medium cloves garlic (1/2 ounce; 15 g), finely grated
+  - '3 medium cloves garlic (1/2 ounce; 15 g), finely grated'
   - 2 tablespoons (about 3/4 ounce; 26 g) light brown sugar
   - 1 tablespoon dry oregano (see notes)
-  - 3 pounds bone-in, skin-on chicken thighs (8 thighs; 1.3kg)
-  - 2 teaspoons Diamond Crystal kosher salt; for table salt, use half as much by volume
+  - '3 pounds bone-in, skin-on chicken thighs (8 thighs; 1.3kg)'
+  - >-
+    2 teaspoons Diamond Crystal kosher salt; for table salt, use half as much by
+    volume
   - Freshly ground black pepper
-  - 5 ounces pitted green olives (142 g; about 1 cup), such as Cerignola
-  - 5 ounces prunes (142 g; about 1 cup), halved if large
+  - '5 ounces pitted green olives (142 g; about 1 cup), such as Cerignola'
+  - '5 ounces prunes (142 g; about 1 cup), halved if large'
   - 2 tablespoons (30 ml) water
-  - Cooked rice or couscous, for serving
+  - 'Cooked rice or couscous, for serving'
 cook_log: []
 created: '2026-05-02'
 updated: '2026-05-02'
