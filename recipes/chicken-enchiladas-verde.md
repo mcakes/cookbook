@@ -35,7 +35,7 @@ updated: '2026-05-02'
 5. Cut kernels off the corn cobs.
 6. When chicken is cool enough to handle, shred it.
 7. Mix shredded chicken with corn and set aside.
-8. In dutch oven, add tomatillos, JalapeÃ±o peppers, Serrano peppers, remaining onion, and garlic cloves. Cover with water and bring to boil. Simmer until tomatillos change color.
+8. In dutch oven, add tomatillos, Jalapeno peppers, Serrano peppers, remaining onion, and garlic cloves. Cover with water and bring to boil. Simmer until tomatillos change color.
 9. Add tomatillos, peppers (may want to only transfer 1/2 of the peppers), onion and garlic to blender.
 10. Add some of the reserved broth and bunch of cilantro (reserve some for garnish)to the blender and blend.
 11. Add blended sauce to dutch oven and simmer for 10 minutes.
