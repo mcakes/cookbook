@@ -1,4 +1,3 @@
-
 ---
 title: "Chicken Enchiladas Verde"
 slug: chicken-enchiladas-verde
