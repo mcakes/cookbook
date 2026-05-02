@@ -32,7 +32,7 @@ export default function AuthModal({ onClose }: AuthModalProps) {
             value={tokenInput}
             onChange={(e) => setTokenInput(e.target.value)}
             placeholder="ghp_…"
-            className="w-full bg-bg border border-line rounded px-3 py-2 mb-4 font-mono text-sm text-ink placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent transition-colors"
+            className="w-full bg-bg border border-line rounded px-3 py-2 mb-4 font-mono text-sm text-ink placeholder:text-muted focus:border-accent transition-colors"
             autoFocus
           />
           <div className="flex justify-end gap-2">
