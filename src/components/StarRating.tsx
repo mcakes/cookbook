@@ -10,7 +10,7 @@ export default function StarRating({ rating, max = 5, onChange }: StarRatingProp
       {Array.from({ length: max }, (_, i) => (
         <span
           key={i}
-          className={`text-lg ${i < rating ? "text-yellow-400" : "text-gray-300"} ${
+          className={`text-lg ${i < rating ? "text-accent" : "text-line"} ${
             onChange ? "cursor-pointer" : ""
           }`}
           onClick={() => onChange?.(i + 1)}
