@@ -11,14 +11,16 @@ export default function CookLog({ entries }: CookLogProps) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3">Cook Log</h2>
+      <h2 className="font-display text-lg font-medium text-ink mb-4 pb-2 border-b border-line">
+        Cook Log
+      </h2>
       <div className="space-y-3">
         {sorted.map((entry, i) => (
-          <div key={i} className="flex gap-3 text-sm">
-            <span className="text-gray-500 whitespace-nowrap font-mono">
+          <div key={i} className="flex gap-4 text-sm">
+            <span className="text-muted whitespace-nowrap font-mono tabular-nums">
               {entry.date}
             </span>
-            {entry.notes && <span className="text-gray-700">{entry.notes}</span>}
+            {entry.notes && <span className="text-ink">{entry.notes}</span>}
           </div>
         ))}
       </div>
