@@ -10,7 +10,8 @@
     "prebuild": "npm run build:index",
     "predev": "npm run build:index",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@uiw/react-md-editor": "^4.1.0",
