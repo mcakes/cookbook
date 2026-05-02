@@ -156,6 +156,8 @@ def resolve_slug(slug: str, recipes_dir: Path = RECIPES_DIR) -> str:
 
 
 def _safe_call(fn):
+    # recipe-scrapers methods inconsistently return None vs. raise for missing
+    # fields; normalize both to None so a single missing field doesn't kill the scrape.
     try:
         return fn()
     except Exception:
