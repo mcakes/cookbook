@@ -18,13 +18,14 @@ async function loadOnce(): Promise<typeof cache> {
   if (cache) return cache;
   if (!inflight) {
     inflight = (async () => {
-      const manifestRes = await fetch("/nutrition/manifest.json");
+      const base = import.meta.env.BASE_URL;
+      const manifestRes = await fetch(`${base}nutrition/manifest.json`);
       if (!manifestRes.ok) throw new Error(`manifest: ${manifestRes.status}`);
       const manifest = await manifestRes.json();
-      const foodsRes = await fetch(`/nutrition/${manifest.foodsPath}`);
+      const foodsRes = await fetch(`${base}nutrition/${manifest.foodsPath}`);
       if (!foodsRes.ok) throw new Error(`foods: ${foodsRes.status}`);
       const foods: Food[] = await foodsRes.json();
-      const mapsRes = await fetch("/data/nutrition-mappings.json");
+      const mapsRes = await fetch(`${base}data/nutrition-mappings.json`);
       const mappings: Mappings = mapsRes.ok ? await mapsRes.json() : {};
       cache = { foods, mappings, mappingsSha: null };
     })();

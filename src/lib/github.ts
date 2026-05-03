@@ -126,7 +126,7 @@ export class GitHubClient {
 
   async fetchMappings(): Promise<{ content: Record<string, unknown>; sha: string | null }> {
     // Try the static file first (works for unauthenticated viewers).
-    const res = await fetch(`/data/nutrition-mappings.json`);
+    const res = await fetch(`${import.meta.env.BASE_URL}data/nutrition-mappings.json`);
     if (res.ok) {
       const content = await res.json();
       return { content, sha: null };
