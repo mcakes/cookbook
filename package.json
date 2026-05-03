@@ -7,8 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "build:index": "tsx scripts/build-index.ts",
-    "prebuild": "npm run build:index",
-    "predev": "npm run build:index",
+    "build:nutrition": "tsx scripts/build-nutrition.ts",
+    "prebuild": "npm run build:index && npm run build:nutrition",
+    "predev": "npm run build:index && npm run build:nutrition",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"

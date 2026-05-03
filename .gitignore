@@ -30,3 +30,7 @@ docs/superpowers
 
 # Python venv
 .venv/
+
+# FDC bulk JSON download cache (build:nutrition)
+scripts/.cache/*
+!scripts/.cache/.gitkeep
