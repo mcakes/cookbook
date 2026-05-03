@@ -1,1 +1,11 @@
-{}
+{
+  "bone-in, skin-on chicken thighs (~2.5 lb / 1.1 kg)": {
+    "foodId": "fdc:2727567",
+    "confirmed": true,
+    "source": "manual",
+    "pieceOverride": {
+      "unit": "",
+      "grams": 1100
+    }
+  }
+}
