@@ -100,6 +100,14 @@ function loadFdc(file: string): FdcFood[] {
 }
 
 function main() {
+  // Skip cleanly when the FDC cache isn't present (e.g. on CI). The committed
+  // dataset in public/nutrition/ is the source of truth for deployment;
+  // regeneration only matters when the cache is available locally.
+  if (!fs.existsSync(FOUNDATION) || !fs.existsSync(SR_LEGACY)) {
+    console.log("Skipping nutrition build: FDC cache not present (using committed dataset)");
+    return;
+  }
+
   const foundation = loadFdc(FOUNDATION);
   const srLegacy   = loadFdc(SR_LEGACY);
   const all: FdcFood[] = [...foundation, ...srLegacy];
