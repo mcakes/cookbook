@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
+import os from "os";
 import path from "path";
 import { execSync } from "child_process";
 
 const CACHE_DIR = path.resolve(import.meta.dirname, ".cache");
-const OUT_DIR   = path.resolve(import.meta.dirname, "../public/nutrition");
 
 const fixture = {
   FoundationFoods: [
@@ -28,9 +28,11 @@ const fixture = {
 describe("build-nutrition", () => {
   let foundationBackup: Buffer | null = null;
   let srBackup: Buffer | null = null;
-  let outDirBefore: Set<string> = new Set();
+  let tmpOut: string;
 
   beforeEach(() => {
+    tmpOut = fs.mkdtempSync(path.join(os.tmpdir(), "nutrition-test-"));
+
     fs.mkdirSync(CACHE_DIR, { recursive: true });
     const fPath = path.join(CACHE_DIR, "foundation.json");
     const sPath = path.join(CACHE_DIR, "sr-legacy.json");
@@ -38,8 +40,6 @@ describe("build-nutrition", () => {
     if (fs.existsSync(sPath)) srBackup = fs.readFileSync(sPath);
     fs.writeFileSync(fPath, JSON.stringify(fixture));
     fs.writeFileSync(sPath, JSON.stringify({ SRLegacyFoods: [] }));
-
-    outDirBefore = fs.existsSync(OUT_DIR) ? new Set(fs.readdirSync(OUT_DIR)) : new Set();
   });
 
   afterEach(() => {
@@ -50,24 +50,17 @@ describe("build-nutrition", () => {
     if (srBackup) fs.writeFileSync(sPath, srBackup);
     else fs.unlinkSync(sPath);
 
-    if (fs.existsSync(OUT_DIR)) {
-      for (const name of fs.readdirSync(OUT_DIR)) {
-        if (!outDirBefore.has(name)) {
-          fs.unlinkSync(path.join(OUT_DIR, name));
-        }
-      }
-      // If we created the directory, remove it too
-      if (outDirBefore.size === 0 && fs.readdirSync(OUT_DIR).length === 0) {
-        fs.rmdirSync(OUT_DIR);
-      }
-    }
+    fs.rmSync(tmpOut, { recursive: true, force: true });
   });
 
   it("emits foods, index, and manifest", () => {
-    execSync("npx tsx scripts/build-nutrition.ts", { stdio: "pipe" });
-    const manifest = JSON.parse(fs.readFileSync(path.join(OUT_DIR, "manifest.json"), "utf-8"));
+    execSync("npx tsx scripts/build-nutrition.ts", {
+      env: { ...process.env, OUT_DIR_OVERRIDE: tmpOut },
+      stdio: "pipe",
+    });
+    const manifest = JSON.parse(fs.readFileSync(path.join(tmpOut, "manifest.json"), "utf-8"));
     expect(manifest.hash).toMatch(/^[0-9a-f]{8}$/);
-    const foods = JSON.parse(fs.readFileSync(path.join(OUT_DIR, manifest.foodsPath), "utf-8"));
+    const foods = JSON.parse(fs.readFileSync(path.join(tmpOut, manifest.foodsPath), "utf-8"));
     expect(foods).toHaveLength(1);
     expect(foods[0].id).toBe("fdc:11952");
     expect(foods[0].defaultPiece).toEqual({ unit: "tomatillo", grams: 34 });

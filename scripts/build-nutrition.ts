@@ -6,7 +6,9 @@ import { NUTRITION_DEFAULTS } from "./nutrition-defaults";
 const CACHE_DIR  = path.resolve(import.meta.dirname, ".cache");
 const FOUNDATION = path.join(CACHE_DIR, "foundation.json");
 const SR_LEGACY  = path.join(CACHE_DIR, "sr-legacy.json");
-const OUT_DIR    = path.resolve(import.meta.dirname, "../public/nutrition");
+const OUT_DIR = process.env.OUT_DIR_OVERRIDE
+  ? path.resolve(process.env.OUT_DIR_OVERRIDE)
+  : path.resolve(import.meta.dirname, "../public/nutrition");
 
 // FDC nutrient IDs we care about (per FDC documentation).
 const NUTRIENT_IDS = {
