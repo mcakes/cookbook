@@ -127,7 +127,7 @@ export default function MealPlannerPage() {
         ))}
       </div>
 
-      <ShoppingList items={shoppingItems} />
+      <ShoppingList derivedItems={shoppingItems} />
     </div>
   );
 }
