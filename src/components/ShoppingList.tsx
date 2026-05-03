@@ -168,7 +168,16 @@ export default function ShoppingList({ derivedItems }: ShoppingListProps) {
               />
             ) : (
               <span
+                role="button"
+                tabIndex={0}
+                aria-label={`Edit ${item.text}`}
                 onClick={() => startEditing(item)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    startEditing(item);
+                  }
+                }}
                 className={
                   item.checked
                     ? "line-through text-muted flex-1 cursor-text"
@@ -181,7 +190,7 @@ export default function ShoppingList({ derivedItems }: ShoppingListProps) {
             <button
               onClick={() => handleDelete(item.id)}
               className="text-line group-hover:text-danger ml-1"
-              aria-label="Delete item"
+              aria-label={`Delete ${item.text}`}
             >
               ×
             </button>
