@@ -22,7 +22,7 @@ ingredients:
   - 2 (15 oz / 425 g) cans butter beans, drained and rinsed
   - 1 pint (~10 oz / 285 g) cherry tomatoes, halved
   - 4 medium cloves garlic, thinly sliced
-  - 1 lemon (zest + juice of half, half cut into wedges for serving)
+  - 1 lemon, zested then halved (juice one half, cut the other into wedges for serving)
   - 1 teaspoon ground cumin
   - 1/2 teaspoon Diamond Crystal kosher salt, plus more to taste
   - Freshly ground black pepper
