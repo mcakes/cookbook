@@ -92,6 +92,38 @@ describe("GitHubClient", () => {
     });
   });
 
+  describe("uploadImage", () => {
+    it("uploads a new image without a sha when none exists", async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(new Response("Not Found", { status: 404 })) // sha lookup
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ content: { sha: "img1" } }), { status: 201 })
+        );
+
+      const sha = await client.uploadImage("photo.png", "aGk=", "ghp_token");
+      expect(sha).toBe("img1");
+      const putBody = JSON.parse(fetchSpy.mock.calls[1][1]?.body as string);
+      expect(putBody.sha).toBeUndefined();
+    });
+
+    it("overwrites an existing image by supplying its current sha", async () => {
+      const fetchSpy = vi
+        .spyOn(globalThis, "fetch")
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ sha: "oldsha" }), { status: 200 }) // sha lookup
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ content: { sha: "img2" } }), { status: 200 })
+        );
+
+      const sha = await client.uploadImage("photo.png", "aGk=", "ghp_token");
+      expect(sha).toBe("img2");
+      const putBody = JSON.parse(fetchSpy.mock.calls[1][1]?.body as string);
+      expect(putBody.sha).toBe("oldsha");
+    });
+  });
+
   describe("deleteRecipeFile", () => {
     it("deletes a recipe file", async () => {
       vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(

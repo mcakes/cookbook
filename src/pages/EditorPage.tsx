@@ -9,6 +9,15 @@ import type { Recipe, CookLogEntry } from "../types/recipe";
 import RecipeForm from "../components/RecipeForm";
 import IngredientsEditor from "../components/IngredientsEditor";
 
+function readFileAsBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve((reader.result as string).split(",")[1]);
+    reader.onerror = () => reject(reader.error ?? new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
 function slugify(title: string): string {
   return title
     .toLowerCase()
@@ -62,18 +71,15 @@ export default function EditorPage() {
     if (!file || !token) return;
 
     setUploading(true);
+    setSaveError(null);
     try {
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64 = (reader.result as string).split(",")[1];
-        const filename = `${slug ?? slugify(title)}.${file.name.split(".").pop()}`;
-        await github.uploadImage(filename, base64, token);
-        setImage(filename);
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
+      const base64 = await readFileAsBase64(file);
+      const filename = `${slug ?? slugify(title)}.${file.name.split(".").pop()}`;
+      await github.uploadImage(filename, base64, token);
+      setImage(filename);
     } catch (err) {
       setSaveError(err instanceof Error ? err.message : "Image upload failed");
+    } finally {
       setUploading(false);
     }
   };

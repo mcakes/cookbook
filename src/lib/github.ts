@@ -103,6 +103,19 @@ export class GitHubClient {
     token: string,
     sha?: string
   ): Promise<string> {
+    const url = `${API_BASE}/repos/${this.owner}/${this.repo}/contents/images/${filename}`;
+
+    if (sha === undefined) {
+      // The Contents API rejects a PUT without a sha if the file already exists.
+      const existing = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      });
+      if (existing.ok) sha = (await existing.json()).sha;
+    }
+
     const body: Record<string, string> = {
       message: `Add image ${filename}`,
       content: base64Content,
@@ -110,7 +123,7 @@ export class GitHubClient {
     if (sha) body.sha = sha;
 
     const res = await fetch(
-      `${API_BASE}/repos/${this.owner}/${this.repo}/contents/images/${filename}`,
+      url,
       {
         method: "PUT",
         headers: {
