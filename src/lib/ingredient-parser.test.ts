@@ -205,6 +205,21 @@ describe("parseIngredient — parenthetical quantities", () => {
     expect(p.restatement).toEqual({ value: 285, unit: "g" });
     expect(p.name).toBe("cherry tomatoes");
   });
+
+  it("treats or-alternative parens as noise, not restatements", () => {
+    const p = parseIngredient("1 1/2 teaspoons Diamond Crystal kosher salt (or 3/4 teaspoon table salt), divided");
+    expect(p.restatement).toBeNull();
+    expect(p.quantity).toBe(1.5);
+    const q = parseIngredient("2 tablespoons rose harissa paste (or 1 tablespoon harissa + 1 teaspoon tomato paste)");
+    expect(q.restatement).toBeNull();
+  });
+
+  it("keeps fractions intact inside parens", () => {
+    const p = parseIngredient("2 tablespoons (about 3/4 ounce; 26 g) light brown sugar");
+    expect(p.restatement).toEqual({ value: 26, unit: "g" });
+    const q = parseIngredient("3 medium cloves garlic (1/2 ounce; 15 g), finely grated");
+    expect(q.restatement).toEqual({ value: 15, unit: "g" });
+  });
 });
 
 describe("coreNameKey", () => {
@@ -332,5 +347,17 @@ describe("scaleIngredientText", () => {
 
   it("leaves unquantified lines unchanged", () => {
     expect(scaleIngredientText("Freshly ground black pepper", 2)).toBe("Freshly ground black pepper");
+  });
+
+  it("drops prose-entangled quantity parens instead of scaling them", () => {
+    expect(scaleIngredientText("1 cup (190 g) short-grain brown rice (yields ~3 cups cooked, ~3/4 cup per serving)", 2))
+      .toBe("2 cup (380 g) short-grain brown rice");
+    expect(scaleIngredientText("1 1/2 teaspoons Diamond Crystal kosher salt (or 3/4 teaspoon table salt), divided", 2))
+      .toBe("3 teaspoons Diamond Crystal kosher salt, divided");
+  });
+
+  it("keeps size-descriptor parens with unknown units unscaled", () => {
+    expect(scaleIngredientText("1 (1-inch / 2.5 cm) piece fresh ginger, finely grated", 2))
+      .toBe("2 (1-inch / 2.5 cm) piece fresh ginger, finely grated");
   });
 });

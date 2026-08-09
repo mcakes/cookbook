@@ -90,11 +90,12 @@ function splitNote(rest: string): { name: string; note: string } {
 
 /** Parse "(14 oz / 400 g)"-style contents into a single metric quantity; metric wins. */
 export function parseParenQuantities(inner: string): MetricQuantity | null {
+  if (/^\s*(?:~\s*)?or\b/i.test(inner)) return null;
   let mass: number | null = null;
   let massIsMetric = false;
   let volume: number | null = null;
   let volumeIsMetric = false;
-  for (const seg of inner.split(/[/;,]/)) {
+  for (const seg of inner.split(/[;,]|(?<!\d)\/|\/(?!\d)/)) {
     const cleaned = seg.replace(/\b(about|approx\.?|total|each)\b/gi, "").replace(/~/g, "").trim();
     const m = cleaned.match(new RegExp(`^(${NUM})\\s*(${UNIT_ALT})\\b`, "i"));
     if (!m) continue;
@@ -157,14 +158,17 @@ export function parseIngredient(text: string): ParsedIngredient {
     }
   }
 
-  // Remaining parens: total weight on counted lines, restatement after a unit,
-  // noise otherwise. All are removed from the name.
-  rest = rest.replace(/\s*\(([^)]*)\)/g, (_whole, inner: string) => {
+  // Remaining parens: total weight on counted lines, restatement after a unit
+  // (a piece noun like "clove"/"can" counts as a unit here too), noise otherwise.
+  // All are removed from the name.
+  rest = rest.replace(/\s*\(([^)]*)\)/g, (_whole, inner: string, offset: number, str: string) => {
     const parsed = parseParenQuantities(inner);
     if (parsed) {
-      if (quantity !== null && unit === "" && totalWeight === null && parsed.unit === "g") {
+      const wordsBefore = str.slice(0, offset).toLowerCase().split(/\W+/).filter(Boolean);
+      const countedInPieces = wordsBefore.some((w) => PIECE_NOUNS.has(w));
+      if (quantity !== null && unit === "" && !countedInPieces && totalWeight === null && parsed.unit === "g") {
         totalWeight = { grams: parsed.value, each: /\beach\b/i.test(inner) };
-      } else if (unit !== "" && restatement === null) {
+      } else if ((unit !== "" || countedInPieces) && restatement === null) {
         restatement = parsed;
       }
     }
@@ -224,10 +228,27 @@ export function coreNameKey(input: string | ParsedIngredient): string {
   return words.join(" ");
 }
 
+const FILLER_RE = /\b(about|approx\.?|total|each)\b/gi;
+const PAREN_SPLIT_RE = /[;,]|(?<!\d)\/|\/(?!\d)/;
+const BARE_NUM_RE = new RegExp(`^${NUM}$`);
+const NUM_WITH_UNIT_RE = new RegExp(`^(${NUM})\\s*(${UNIT_ALT})\\b`, "i");
+const PURE_QUANTITY_RE = new RegExp(`^(${NUM})\\s*(${UNIT_ALT})?$`, "i");
+
+/** Filler-stripped, "or"-stripped segments of a paren's contents. */
+function scaleableSegments(inner: string): string[] {
+  return inner
+    .split(PAREN_SPLIT_RE)
+    .map((seg) => seg.replace(FILLER_RE, "").replace(/~/g, "").trim())
+    .map((seg, i) => (i === 0 ? seg.replace(/^or\b\s*/i, "") : seg))
+    .filter(Boolean);
+}
+
 /**
  * Scale an ingredient string in place, preserving all prose.
- * Package-size parens (the can is still a 400 g can) and noise parens are
- * untouched; restatement/total-weight parens scale.
+ * Package-size parens (the can is still a 400 g can) and descriptive-noise
+ * parens are untouched; pure-quantity parens scale; parens whose quantities
+ * are entangled with prose (yields, or-alternatives, count-plus-weight notes)
+ * are dropped from scaled display rather than shown with a wrong number.
  */
 export function scaleIngredientText(text: string, factor: number): string {
   const parsed = parseIngredient(text);
@@ -261,16 +282,28 @@ export function scaleIngredientText(text: string, factor: number): string {
     if (scaledQty <= 1 && isPlural) out = out.replace(parsed.unitRaw, parsed.unitRaw.slice(0, -1));
   }
 
-  // Parens: skip the package-size paren and noise; scale quantity parens.
-  return out.replace(/\(([^)]*)\)/g, (whole, inner: string, offset: number, str: string) => {
+  // Parens: skip the package-size paren and descriptive noise; scale
+  // pure-quantity parens; drop parens whose quantities are entangled with
+  // prose rather than display a wrong scaled number.
+  const scaled = out.replace(/\(([^)]*)\)/g, (whole, inner: string, offset: number, str: string) => {
     const before = str.slice(0, offset).trim();
     const isPackageParen =
       parsed.packageSize !== null && new RegExp(`^${NUM}$`).test(before);
     if (isPackageParen) return whole;
-    if (parseParenQuantities(inner) === null) return whole;
+
+    const segments = scaleableSegments(inner);
+    const hasKnownQuantity = segments.some(
+      (seg) => BARE_NUM_RE.test(seg) || NUM_WITH_UNIT_RE.test(seg)
+    );
+    if (!hasKnownQuantity) return whole; // descriptive noise — leave unscaled
+
+    const allPureQuantities = segments.every((seg) => PURE_QUANTITY_RE.test(seg));
+    if (!allPureQuantities) return ""; // entangled with prose — drop rather than show a wrong number
+
     const scaledInner = inner.replace(new RegExp(NUM, "g"), (tok) =>
       formatQuantity(evalNumber(tok) * factor)
     );
     return `(${scaledInner})`;
   });
+  return scaled.replace(/[ \t]+,/g, ",").replace(/[ \t]{2,}/g, " ").trimEnd();
 }

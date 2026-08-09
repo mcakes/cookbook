@@ -78,7 +78,10 @@ export function aggregateIngredients(ingredients: string[]): string[] {
       out.push(g.nonNumeric > 1 ? `${g.firstOriginal} ×${g.nonNumeric}` : g.firstOriginal);
       continue;
     }
-    const count = g.count + g.nonNumeric;  // unquantified lines count as 1 each
+    // Unquantified duplicates only count as 1 each when the group already has
+    // a count; if the group's numeric evidence is mass/volume-only, a bare
+    // "lemon" doesn't get its own phantom count line.
+    const count = g.count > 0 ? g.count + g.nonNumeric : g.count;
     if (count > 0) out.push(`${formatQuantity(count)} ${g.firstName}`);
     if (g.massG > 0) {
       const unit = pickUnit(g, MASS_TO_G);

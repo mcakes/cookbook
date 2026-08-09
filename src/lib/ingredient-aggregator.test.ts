@@ -56,6 +56,10 @@ describe("aggregateIngredients", () => {
     expect(aggregateIngredients(["2 lemons", "lemon"])).toEqual(["3 lemons"]);
   });
 
+  it("does not emit a phantom count line for unquantified duplicates of a weighed ingredient", () => {
+    expect(aggregateIngredients(["200g lemons", "lemon"])).toEqual(["200 g lemons"]);
+  });
+
   it("preserves first-seen order", () => {
     expect(aggregateIngredients([
       "1 whole chicken", "2 bay leaves", "5 cloves garlic", "1 whole chicken",

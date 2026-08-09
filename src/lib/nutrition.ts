@@ -47,6 +47,8 @@ export function resolveGrams(
   if (parsed.unit in VOL_TO_ML) return mlToGrams(parsed.quantity * VOL_TO_ML[parsed.unit]);
 
   // 4. Per-piece: override → weight stated on the line → food default.
+  // A hand-confirmed pieceOverride is trusted over the line's own stated
+  // weight — someone has already verified it against the food actually used.
   if (mapping?.pieceOverride) return { grams: parsed.quantity * mapping.pieceOverride.grams };
   if (parsed.totalWeight) {
     return {
