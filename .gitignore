@@ -30,6 +30,11 @@ docs/superpowers
 
 # Python venv
 .venv/
+__pycache__/
+
+# Saved recipe pages for import_recipe.py --html (index.html is the app entry)
+/*.html
+!/index.html
 
 # FDC bulk JSON download cache (build:nutrition)
 scripts/.cache/*
