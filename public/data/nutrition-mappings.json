@@ -17,5 +17,10 @@
     "foodId": "fdc:171328",
     "confirmed": true,
     "source": "manual"
+  },
+  "greek yogurt": {
+    "foodId": "fdc:2259794",
+    "confirmed": true,
+    "source": "manual"
   }
 }
