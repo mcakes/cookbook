@@ -20,6 +20,16 @@ function pickUnit(g: Group, table: Record<string, number>): string {
   return candidates[0][0];
 }
 
+/**
+ * Unit-converted totals accumulate float error (e.g. 3 tbsp + 60 ml + 3 tbsp
+ * = 10.058 tbsp), so snap near-integers before formatting. Counts stay exact
+ * and don't need this.
+ */
+function formatUnitTotal(n: number): string {
+  const snapped = Math.abs(n - Math.round(n)) < 0.1 ? Math.round(n) : n;
+  return formatQuantity(snapped);
+}
+
 export function aggregateIngredients(ingredients: string[]): string[] {
   const groups = new Map<string, Group>();
   const order: string[] = [];
@@ -72,11 +82,11 @@ export function aggregateIngredients(ingredients: string[]): string[] {
     if (count > 0) out.push(`${formatQuantity(count)} ${g.firstName}`);
     if (g.massG > 0) {
       const unit = pickUnit(g, MASS_TO_G);
-      out.push(`${formatQuantity(g.massG / MASS_TO_G[unit])} ${unit} ${g.firstName}`);
+      out.push(`${formatUnitTotal(g.massG / MASS_TO_G[unit])} ${unit} ${g.firstName}`);
     }
     if (g.volMl > 0) {
       const unit = pickUnit(g, VOL_TO_ML);
-      out.push(`${formatQuantity(g.volMl / VOL_TO_ML[unit])} ${unit} ${g.firstName}`);
+      out.push(`${formatUnitTotal(g.volMl / VOL_TO_ML[unit])} ${unit} ${g.firstName}`);
     }
   }
   return out;
