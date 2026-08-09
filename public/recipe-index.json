@@ -1,5 +1,28 @@
 [
   {
+    "title": "Ajo Blanco",
+    "slug": "ajo-blanco",
+    "tags": [],
+    "rating": null,
+    "servings": 4,
+    "prep_time": 15,
+    "cook_time": 60,
+    "ingredients": [
+      "150 g blanched almonds",
+      "60 g stale white bread, crusts removed",
+      "1 small garlic clove",
+      "325 ml ice water",
+      "100 ml extra-virgin olive oil",
+      "1 tbsp sherry vinegar",
+      "1 tsp fine salt",
+      "3 tbsp Marcona almonds, toasted and roughly chopped, to serve",
+      "Flaky salt and best finishing olive oil, to serve"
+    ],
+    "cook_log": [],
+    "created": "undefined",
+    "updated": "undefined"
+  },
+  {
     "title": "Chicken Enchiladas Verde",
     "slug": "chicken-enchiladas-verde",
     "tags": [
@@ -302,5 +325,33 @@
     "cook_log": [],
     "created": "2026-08-09",
     "updated": "2026-08-09"
+  },
+  {
+    "title": "Vinegar-Marinated Cherry Tomatoes",
+    "slug": "vinegar-marinated-cherry-tomatoes",
+    "tags": [],
+    "rating": null,
+    "servings": 4,
+    "prep_time": 30,
+    "cook_time": 60,
+    "ingredients": [
+      "700 g mixed cherry tomatoes (buy extra to allow for culls)",
+      "60 ml sherry vinegar",
+      "60 ml cold water",
+      "1 1/2 tsp sugar",
+      "1 tsp fine salt",
+      "1/2 tsp coriander seed",
+      "1/4 tsp fennel seed",
+      "1 garlic clove, smashed",
+      "1 wide strip lemon zest",
+      "4 basil stems (leaves reserved)",
+      "2 tbsp extra-virgin olive oil",
+      "1/2 English cucumber, to serve",
+      "1/4 cup basil or mint leaves, torn, to serve",
+      "Flaky salt and best finishing olive oil, to serve"
+    ],
+    "cook_log": [],
+    "created": "undefined",
+    "updated": "undefined"
   }
 ]
