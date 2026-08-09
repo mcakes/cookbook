@@ -2,6 +2,12 @@ import type { RecipeIndex } from "../types/recipe";
 
 const API_BASE = "https://api.github.com";
 
+/** Decode GitHub's base64 file content as UTF-8 (atob alone mangles multibyte chars). */
+function decodeBase64Utf8(base64: string): string {
+  const binary = atob(base64.replace(/\n/g, ""));
+  return new TextDecoder().decode(Uint8Array.from(binary, (c) => c.charCodeAt(0)));
+}
+
 export class GitHubClient {
   private owner: string;
   private repo: string;
@@ -33,7 +39,7 @@ export class GitHubClient {
     if (!res.ok) throw new Error(`Failed to fetch recipe: ${res.status}`);
 
     const data = await res.json();
-    const content = atob(data.content.replace(/\n/g, ""));
+    const content = decodeBase64Utf8(data.content);
     return { content, sha: data.sha };
   }
 
@@ -141,7 +147,7 @@ export class GitHubClient {
     );
     if (!res.ok) throw new Error(`Failed to fetch mappings: ${res.status}`);
     const data = await res.json();
-    const decoded = atob(data.content.replace(/\n/g, ""));
+    const decoded = decodeBase64Utf8(data.content);
     return { content: JSON.parse(decoded), sha: data.sha };
   }
 
