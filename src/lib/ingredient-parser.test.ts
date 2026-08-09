@@ -88,3 +88,46 @@ describe("formatQuantity", () => {
     expect(formatQuantity(2.6)).toBe("2.6");
   });
 });
+
+describe("parseIngredient — notes and noise parens", () => {
+  it("splits prep notes at a comma followed by a prep word", () => {
+    const p = parseIngredient("1 large yellow onion, finely diced");
+    expect(p.name).toBe("large yellow onion");
+    expect(p.note).toBe("finely diced");
+  });
+
+  it("keeps commas that are part of the name", () => {
+    const p = parseIngredient("8 bone-in, skin-on chicken thighs");
+    expect(p.name).toBe("bone-in, skin-on chicken thighs");
+    expect(p.note).toBe("");
+  });
+
+  it("splits multi-clause notes at the first prep word", () => {
+    const p = parseIngredient("2 red bell peppers, cored, seeded, and thinly sliced");
+    expect(p.name).toBe("red bell peppers");
+    expect(p.note).toBe("cored, seeded, and thinly sliced");
+  });
+
+  it("treats 'plus …' as a note", () => {
+    const p = parseIngredient("3 tablespoons extra-virgin olive oil, plus more for finishing");
+    expect(p.name).toBe("extra-virgin olive oil");
+    expect(p.note).toBe("plus more for finishing");
+  });
+
+  it("strips non-quantity parens from the name", () => {
+    const p = parseIngredient("1/2 teaspoon red pepper flakes (optional)");
+    expect(p.name).toBe("red pepper flakes");
+  });
+
+  it("strips 'such as' parens", () => {
+    const p = parseIngredient("3 tablespoons neutral oil (such as avocado or grapeseed), divided");
+    expect(p.name).toBe("neutral oil");
+    expect(p.note).toBe("divided");
+  });
+
+  it("strips alternative parens", () => {
+    const p = parseIngredient("1 1/2 teaspoons Diamond Crystal kosher salt (or 3/4 teaspoon table salt), divided");
+    expect(p.name).toBe("Diamond Crystal kosher salt");
+    expect(p.note).toBe("divided");
+  });
+});

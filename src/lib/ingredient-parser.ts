@@ -68,6 +68,26 @@ export function formatQuantity(n: number): string {
   return parseFloat(n.toFixed(2)).toString();
 }
 
+const NOTE_WORDS = new Set([
+  "sliced", "diced", "chopped", "minced", "grated", "drained", "rinsed",
+  "halved", "quartered", "stemmed", "cored", "seeded", "peeled", "cut",
+  "zested", "juiced", "crumbled", "husked", "divided", "plus", "for", "to", "such",
+  "roughly", "finely", "thinly", "freshly", "about", "optional",
+  "preferably", "softened", "melted", "beaten", "trimmed", "shredded",
+  "torn", "packed",
+]);
+
+function splitNote(rest: string): { name: string; note: string } {
+  const commaRe = /,\s*([A-Za-z-]+)/g;
+  let m: RegExpExecArray | null;
+  while ((m = commaRe.exec(rest)) !== null) {
+    if (NOTE_WORDS.has(m[1].toLowerCase())) {
+      return { name: rest.slice(0, m.index), note: rest.slice(m.index + 1).trim() };
+    }
+  }
+  return { name: rest, note: "" };
+}
+
 export function parseIngredient(text: string): ParsedIngredient {
   const original = text;
   let rest = text.trim();
@@ -100,9 +120,13 @@ export function parseIngredient(text: string): ParsedIngredient {
     }
   }
 
-  const name = rest.replace(/\s+/g, " ").trim();
+  // Remaining parens are noise at this stage — strip from the name.
+  rest = rest.replace(/\s*\([^)]*\)/g, "");
+
+  const { name: rawName, note } = splitNote(rest);
+  const name = rawName.replace(/\s+/g, " ").trim().replace(/,+$/, "");
   return {
     original, quantity, quantityMax, unit, unitRaw,
-    packageSize, restatement, totalWeight, name, note: "",
+    packageSize, restatement, totalWeight, name, note,
   };
 }
