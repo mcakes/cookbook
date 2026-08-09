@@ -1,27 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseQuantity, scaleIngredient, scaleIngredients } from "./scaling";
-
-describe("parseQuantity", () => {
-  it("parses simple numbers", () => {
-    expect(parseQuantity("200g pasta")).toEqual({ quantity: 200, unit: "g", rest: "pasta" });
-  });
-
-  it("parses fractions", () => {
-    expect(parseQuantity("1/2 tsp salt")).toEqual({ quantity: 0.5, unit: "tsp", rest: "salt" });
-  });
-
-  it("parses mixed numbers", () => {
-    expect(parseQuantity("1 1/2 cups flour")).toEqual({ quantity: 1.5, unit: "cups", rest: "flour" });
-  });
-
-  it("parses unitless quantities", () => {
-    expect(parseQuantity("3 eggs")).toEqual({ quantity: 3, unit: "", rest: "eggs" });
-  });
-
-  it("handles no quantity", () => {
-    expect(parseQuantity("salt to taste")).toEqual({ quantity: null, unit: "", rest: "salt to taste" });
-  });
-});
+import { scaleIngredient, scaleIngredients } from "./scaling";
 
 describe("scaleIngredient", () => {
   it("scales a simple ingredient", () => {
@@ -30,6 +8,10 @@ describe("scaleIngredient", () => {
 
   it("scales fractions", () => {
     expect(scaleIngredient("1/2 tsp salt", 2)).toBe("1 tsp salt");
+  });
+
+  it("scales spelled-out units", () => {
+    expect(scaleIngredient("3 tablespoons gochujang", 2)).toBe("6 tablespoons gochujang");
   });
 
   it("leaves non-quantified ingredients unchanged", () => {

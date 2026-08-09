@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseIngredient, formatQuantity, coreNameKey } from "./ingredient-parser";
+import { parseIngredient, formatQuantity, coreNameKey, scaleIngredientText } from "./ingredient-parser";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -283,5 +283,49 @@ describe("corpus invariants", () => {
       expect(key.length, line).toBeGreaterThan(0);
       expect(key, line).not.toMatch(/[(),]/);
     }
+  });
+});
+
+describe("scaleIngredientText", () => {
+  it("scales attached units", () => {
+    expect(scaleIngredientText("200g pasta", 2)).toBe("400g pasta");
+  });
+
+  it("scales fractions to whole numbers", () => {
+    expect(scaleIngredientText("1/2 tsp salt", 2)).toBe("1 tsp salt");
+  });
+
+  it("scales spelled-out units and fixes plurality", () => {
+    expect(scaleIngredientText("1 tablespoon maple syrup", 2)).toBe("2 tablespoons maple syrup");
+    expect(scaleIngredientText("2 tablespoons rice vinegar", 0.5)).toBe("1 tablespoon rice vinegar");
+  });
+
+  it("scales both ends of a range", () => {
+    expect(scaleIngredientText("1/4 to 1/2 teaspoon Aleppo pepper or red pepper flakes", 2))
+      .toBe("1/2 to 1 teaspoon Aleppo pepper or red pepper flakes");
+  });
+
+  it("never scales package-size parens", () => {
+    expect(scaleIngredientText("1 (28 oz / 800 g) can crushed tomatoes", 2))
+      .toBe("2 (28 oz / 800 g) can crushed tomatoes");
+  });
+
+  it("scales restatement parens", () => {
+    expect(scaleIngredientText("1/2 cup (120 ml) low-sodium chicken or vegetable broth", 2))
+      .toBe("1 cup (240 ml) low-sodium chicken or vegetable broth");
+  });
+
+  it("scales total-weight parens", () => {
+    expect(scaleIngredientText("8 bone-in, skin-on chicken thighs (~2.5 lb / 1.1 kg)", 0.5))
+      .toBe("4 bone-in, skin-on chicken thighs (~1 1/4 lb / 0.55 kg)");
+  });
+
+  it("leaves noise parens alone (and pluralises the unit)", () => {
+    expect(scaleIngredientText("1/2 teaspoon red pepper flakes (optional)", 3))
+      .toBe("1 1/2 teaspoons red pepper flakes (optional)");
+  });
+
+  it("leaves unquantified lines unchanged", () => {
+    expect(scaleIngredientText("Freshly ground black pepper", 2)).toBe("Freshly ground black pepper");
   });
 });

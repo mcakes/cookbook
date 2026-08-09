@@ -223,3 +223,54 @@ export function coreNameKey(input: string | ParsedIngredient): string {
   }
   return words.join(" ");
 }
+
+/**
+ * Scale an ingredient string in place, preserving all prose.
+ * Package-size parens (the can is still a 400 g can) and noise parens are
+ * untouched; restatement/total-weight parens scale.
+ */
+export function scaleIngredientText(text: string, factor: number): string {
+  const parsed = parseIngredient(text);
+  if (parsed.quantity === null) return text;
+
+  let out: string;
+  const attached = text.match(new RegExp(`^(\\s*)(\\d+(?:\\.\\d+)?)(${UNIT_ALT})\\b`, "i"));
+  const range = text.match(new RegExp(`^(\\s*)(${NUM})(\\s+to\\s+)(${NUM})`));
+  const plain = text.match(new RegExp(`^(\\s*)(${NUM})`));
+  if (attached) {
+    out = text.replace(
+      attached[0],
+      `${attached[1]}${formatQuantity(parseFloat(attached[2]) * factor)}${attached[3]}`
+    );
+  } else if (range) {
+    out = text.replace(
+      range[0],
+      `${range[1]}${formatQuantity(evalNumber(range[2]) * factor)}${range[3]}${formatQuantity(evalNumber(range[4]) * factor)}`
+    );
+  } else if (plain) {
+    out = text.replace(plain[0], `${plain[1]}${formatQuantity(evalNumber(plain[2]) * factor)}`);
+  } else {
+    return text;
+  }
+
+  // Spelled-out units agree in number with the new quantity.
+  if (parsed.unitRaw.length > 4) {
+    const scaledQty = (parsed.quantityMax ?? parsed.quantity) * factor;
+    const isPlural = parsed.unitRaw.endsWith("s");
+    if (scaledQty > 1 && !isPlural) out = out.replace(parsed.unitRaw, `${parsed.unitRaw}s`);
+    if (scaledQty <= 1 && isPlural) out = out.replace(parsed.unitRaw, parsed.unitRaw.slice(0, -1));
+  }
+
+  // Parens: skip the package-size paren and noise; scale quantity parens.
+  return out.replace(/\(([^)]*)\)/g, (whole, inner: string, offset: number, str: string) => {
+    const before = str.slice(0, offset).trim();
+    const isPackageParen =
+      parsed.packageSize !== null && new RegExp(`^${NUM}$`).test(before);
+    if (isPackageParen) return whole;
+    if (parseParenQuantities(inner) === null) return whole;
+    const scaledInner = inner.replace(new RegExp(NUM, "g"), (tok) =>
+      formatQuantity(evalNumber(tok) * factor)
+    );
+    return `(${scaledInner})`;
+  });
+}
