@@ -327,6 +327,35 @@
     "updated": "2026-08-09"
   },
   {
+    "title": "Tomato Tarte Tatin",
+    "slug": "tomato-tarte-tatin",
+    "tags": [],
+    "rating": null,
+    "servings": 8,
+    "prep_time": 20,
+    "cook_time": 70,
+    "image": "https://www.seriouseats.com/thmb/kjEsrlvtAtIu9suSrNgA3kgNuhg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20250820-SEA-TomatoTarteTatin-RobbyLozano-HERO-ce302d4eae2e4d7b995f933bd36026fd.jpg",
+    "ingredients": [
+      "1/2 recipe old-fashioned flaky pie dough prepared through step 2 or 1 sheet frozen puff pastry (397 g; 14 ounces), thawed",
+      "4 tablespoons (2 ounces; 57 g) unsalted butter, softened, divided",
+      "1 small yellow onion (4 ounces; 113 g), thinly sliced (about 3/4 cup)",
+      "2 tablespoons (30 ml) dry sherry (such as fino or manzanilla)",
+      "3/4 cup (180 ml) homemade chicken stock or store-bought low-sodium chicken or vegetable broth",
+      "1 teaspoon chopped fresh thyme leaves",
+      "1/2 teaspoon Diamond Crystal kosher salt, divided; for table salt, use half as much by volume",
+      "1 tablespoon granulated sugar (1/2 ounce; 15 g)",
+      "1/4 teaspoon freshly ground black pepper, plus more for serving",
+      "1 pound (455 g) cherry or grape tomatoes (see notes)",
+      "2 ounces (57 g) Gruyère cheese, grated (about 1/2 cup)",
+      "2 tablespoons (30 ml) Dijon mustard",
+      "Fresh thyme leaves, for serving",
+      "Flaky sea salt, for serving"
+    ],
+    "cook_log": [],
+    "created": "2026-08-09",
+    "updated": "2026-08-09"
+  },
+  {
     "title": "Vinegar-Marinated Cherry Tomatoes",
     "slug": "vinegar-marinated-cherry-tomatoes",
     "tags": [],

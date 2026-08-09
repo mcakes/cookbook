@@ -259,6 +259,11 @@ describe("coreNameKey", () => {
     ];
     expect(new Set(variants.map(coreNameKey)).size).toBe(1);
   });
+
+  it("transforms the existing mappings-file key (migration contract)", () => {
+    expect(coreNameKey("bone-in, skin-on chicken thighs (~2.5 lb / 1.1 kg)"))
+      .toBe("bone-in skin-on chicken thigh");
+  });
 });
 
 describe("corpus invariants", () => {
