@@ -277,5 +277,30 @@
     "cook_log": [],
     "created": "2026-05-02",
     "updated": "2026-05-02"
+  },
+  {
+    "title": "Tomato Fritters",
+    "slug": "tomato-fritters",
+    "tags": [],
+    "servings": 4,
+    "prep_time": 25,
+    "cook_time": 25,
+    "ingredients": [
+      "3 medium tomatoes",
+      "1/2 medium yellow onion, diced",
+      "4 oz feta cheese",
+      "1 oz parsley, roughly chopped",
+      "1/2 oz dill, roughly chopped",
+      "1 tsp dried thyme",
+      "1 tsp dried oregano",
+      "1 large egg",
+      "1 tsp kosher salt",
+      "1/2 tsp black pepper",
+      "4 cup neutral oil (for frying)",
+      "Greek yogurt (for serving)"
+    ],
+    "cook_log": [],
+    "created": "2026-08-09",
+    "updated": "2026-08-09"
   }
 ]
