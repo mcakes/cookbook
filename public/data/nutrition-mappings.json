@@ -7,5 +7,10 @@
       "unit": "",
       "grams": 130
     }
+  },
+  "dried thyme": {
+    "foodId": "fdc:170938",
+    "confirmed": true,
+    "source": "manual"
   }
 }
