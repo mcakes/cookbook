@@ -1,16 +1,4 @@
-import { parseIngredient, scaleIngredientText } from "./ingredient-parser";
-
-export interface ParsedQuantity {
-  quantity: number | null;
-  unit: string;
-  rest: string;
-}
-
-/** @deprecated transition wrapper for nutrition.ts — removed once it consumes the parser directly. */
-export function parseQuantity(ingredient: string): ParsedQuantity {
-  const p = parseIngredient(ingredient);
-  return { quantity: p.quantity, unit: p.unit, rest: p.name };
-}
+import { scaleIngredientText } from "./ingredient-parser";
 
 /**
  * Scale an ingredient string by the given factor.

@@ -27,46 +27,69 @@ const olive: Food = {
   density_g_per_ml: 0.92,
 };
 
+import { parseIngredient } from "./ingredient-parser";
+
 describe("resolveGrams", () => {
-  it("converts mass units to grams", () => {
-    expect(resolveGrams({ quantity: 2, unit: "lbs" }, tomatillo, undefined).grams).toBeCloseTo(907.18, 1);
-    expect(resolveGrams({ quantity: 200, unit: "g" },  tomatillo, undefined).grams).toBe(200);
-    expect(resolveGrams({ quantity: 1,   unit: "kg" },  tomatillo, undefined).grams).toBe(1000);
-    expect(resolveGrams({ quantity: 8,   unit: "oz" }, tomatillo, undefined).grams).toBeCloseTo(226.8, 1);
+  it("converts mass units to grams, including spelled-out ones", () => {
+    expect(resolveGrams(parseIngredient("2 lbs tomatillos"), tomatillo, undefined).grams).toBeCloseTo(907.18, 1);
+    expect(resolveGrams(parseIngredient("200g tomatillos"), tomatillo, undefined).grams).toBe(200);
+    expect(resolveGrams(parseIngredient("3 pounds tomatillos"), tomatillo, undefined).grams).toBeCloseTo(1360.78, 1);
+    expect(resolveGrams(parseIngredient("8 oz tomatillos"), tomatillo, undefined).grams).toBeCloseTo(226.8, 1);
   });
 
-  it("converts volume to grams via density", () => {
-    const r = resolveGrams({ quantity: 1, unit: "tbsp" }, olive, undefined);
-    expect(r.grams).toBeCloseTo(14.79 * 0.92, 1);
+  it("converts volume via density, spelled-out units included", () => {
+    const r = resolveGrams(parseIngredient("2 tablespoons olive oil"), olive, undefined);
+    expect(r.grams).toBeCloseTo(2 * 14.7868 * 0.92, 1);
     expect(r.approximate).toBeFalsy();
   });
 
-  it("falls back to water-equivalent when no density, flagging approximate", () => {
-    const r = resolveGrams({ quantity: 1, unit: "cup" }, tomatillo, undefined);
+  it("falls back to water-equivalent volume, flagged approximate", () => {
+    const r = resolveGrams(parseIngredient("1 cup tomatillos"), tomatillo, undefined);
     expect(r.grams).toBeCloseTo(236.59, 1);
     expect(r.approximate).toBe(true);
   });
 
-  it("uses defaultPiece when unit matches", () => {
-    const r = resolveGrams({ quantity: 5, unit: "" }, tomatillo, undefined);
-    expect(r.grams).toBe(170); // 5 × 34
-  });
-
-  it("uses pieceOverride preferentially over defaultPiece", () => {
-    const mapping: IngredientMapping = { foodId: tomatillo.id, confirmed: true, source: "manual",
-      pieceOverride: { unit: "", grams: 50 } };
-    const r = resolveGrams({ quantity: 2, unit: "" }, tomatillo, mapping);
+  it("prefers a metric restatement over unit conversion", () => {
+    const r = resolveGrams(parseIngredient("1/2 cup (100 g) tomatillos"), tomatillo, undefined);
     expect(r.grams).toBe(100);
+    expect(r.approximate).toBeFalsy();
   });
 
-  it("returns null grams when unit is unrecognised and no piece info", () => {
-    const r = resolveGrams({ quantity: 1, unit: "" }, olive, undefined); // olive has no defaultPiece
-    expect(r.grams).toBeNull();
+  it("resolves package size × count", () => {
+    const r = resolveGrams(parseIngredient("2 (15 oz / 425 g) cans butter beans"), tomatillo, undefined);
+    expect(r.grams).toBe(850);
   });
 
-  it("returns null grams when quantity is null", () => {
-    const r = resolveGrams({ quantity: null, unit: "" }, tomatillo, undefined);
-    expect(r.grams).toBeNull();
+  it("resolves ml packages via density", () => {
+    const r = resolveGrams(parseIngredient("1 (400 ml) can olive oil"), olive, undefined);
+    expect(r.grams).toBeCloseTo(400 * 0.92, 1);
+  });
+
+  it("derives per-piece weight from a total-weight paren", () => {
+    const r = resolveGrams(parseIngredient("8 chicken thighs (~1.1 kg)"), tomatillo, undefined);
+    expect(r.grams).toBeCloseTo(1100, 0);
+  });
+
+  it("multiplies each-weights by the count", () => {
+    const r = resolveGrams(parseIngredient("4 salmon fillets (~170 g each)"), tomatillo, undefined);
+    expect(r.grams).toBe(680);
+  });
+
+  it("uses defaultPiece for bare counts", () => {
+    expect(resolveGrams(parseIngredient("5 tomatillos"), tomatillo, undefined).grams).toBe(170);
+  });
+
+  it("prefers pieceOverride over defaultPiece and derived weights", () => {
+    const mapping: IngredientMapping = {
+      foodId: tomatillo.id, confirmed: true, source: "manual",
+      pieceOverride: { unit: "", grams: 50 },
+    };
+    expect(resolveGrams(parseIngredient("2 tomatillos"), tomatillo, mapping).grams).toBe(100);
+  });
+
+  it("returns null grams without quantity or piece info", () => {
+    expect(resolveGrams(parseIngredient("1 splash olive oil"), olive, undefined).grams).toBeNull();
+    expect(resolveGrams(parseIngredient("olive oil"), olive, undefined).grams).toBeNull();
   });
 });
 
@@ -98,10 +121,10 @@ import type { Mappings } from "./nutrition-types";
 describe("computeRecipeNutrition", () => {
   const foods: Food[] = [tomatillo, olive];
 
-  it("computes per-recipe totals from confirmed mappings", () => {
+  it("computes totals from confirmed core-name mappings", () => {
     const mappings: Mappings = {
-      "tomatillos":  { foodId: "fdc:11952", confirmed: true, source: "manual" },
-      "olive oil":   { foodId: "fdc:171413", confirmed: true, source: "manual" },
+      "tomatillo": { foodId: "fdc:11952", confirmed: true, source: "manual" },
+      "olive oil": { foodId: "fdc:171413", confirmed: true, source: "manual" },
     };
     const { rows, totals } = computeRecipeNutrition(
       ["2 lbs tomatillos", "2 tbsp olive oil"],
@@ -110,17 +133,30 @@ describe("computeRecipeNutrition", () => {
     );
     expect(rows).toHaveLength(2);
     expect(rows[0].status).toBe("ok");
+    expect(rows[0].key).toBe("tomatillo");
     expect(rows[0].grams).toBeCloseTo(907.18, 1);
     expect(totals.kcal).toBeCloseTo((907.18 * 32 + 14.7868 * 2 * 0.92 * 884) / 100, 1);
     expect(totals.unmatchedCount).toBe(0);
   });
 
-  it("auto-matches missing entries in memory without mutating input mappings", () => {
+  it("keys survive rewording", () => {
+    const mappings: Mappings = {
+      "tomatillo": { foodId: "fdc:11952", confirmed: true, source: "manual" },
+    };
+    const { rows } = computeRecipeNutrition(
+      ["2 lbs tomatillos, husked and rinsed"],
+      foods,
+      mappings
+    );
+    expect(rows[0].status).toBe("ok");
+  });
+
+  it("auto-matches missing entries without mutating input mappings", () => {
     const mappings: Mappings = {};
     const before = JSON.stringify(mappings);
     const { rows } = computeRecipeNutrition(["2 lbs tomatillos"], foods, mappings);
     expect(rows[0].status).toBe("ok");
-    expect(JSON.stringify(mappings)).toBe(before); // unchanged
+    expect(JSON.stringify(mappings)).toBe(before);
   });
 
   it("flags unmatched ingredients and counts them", () => {
@@ -143,7 +179,6 @@ describe("computeRecipeNutrition", () => {
     const mappings: Mappings = {
       "olive oil": { foodId: "fdc:171413", confirmed: true, source: "manual" },
     };
-    // no quantity → no-weight
     const { rows } = computeRecipeNutrition(["olive oil"], foods, mappings);
     expect(rows[0].status).toBe("no-weight");
   });
@@ -158,7 +193,7 @@ describe("computeRecipeNutrition", () => {
 
   it("propagates approximate flag from volume-without-density", () => {
     const mappings: Mappings = {
-      "tomatillos": { foodId: "fdc:11952", confirmed: true, source: "manual" },
+      "tomatillo": { foodId: "fdc:11952", confirmed: true, source: "manual" },
     };
     const { rows } = computeRecipeNutrition(["1 cup tomatillos"], foods, mappings);
     expect(rows[0].status).toBe("approximate");
