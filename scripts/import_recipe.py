@@ -1,8 +1,9 @@
 """Import a recipe from a URL into recipes/<slug>.md.
 
-Usage: python scripts/import_recipe.py <url>
+Usage: python scripts/import_recipe.py <url> [--html FILE]
 """
 
+import argparse
 import re
 import sys
 from datetime import date
@@ -164,21 +165,29 @@ def _safe_call(fn):
         return None
 
 
-def scrape(url: str) -> dict:
-    try:
-        response = requests.get(
-            url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT}
-        )
-        response.raise_for_status()
-    except requests.RequestException as exc:
-        print(f"Error: could not fetch {url}: {exc}", file=sys.stderr)
-        sys.exit(1)
+def scrape(url: str, html_path: Path | None = None) -> dict:
+    if html_path is not None:
+        try:
+            html = html_path.read_text(encoding="utf-8")
+        except OSError as exc:
+            print(f"Error: could not read {html_path}: {exc}", file=sys.stderr)
+            sys.exit(1)
+    else:
+        try:
+            response = requests.get(
+                url, timeout=REQUEST_TIMEOUT, headers={"User-Agent": USER_AGENT}
+            )
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            print(f"Error: could not fetch {url}: {exc}", file=sys.stderr)
+            sys.exit(1)
+        html = response.text
 
     try:
-        scraper = scrape_html(response.text, org_url=url)
+        scraper = scrape_html(html, org_url=url)
     except WebsiteNotImplementedError:
         try:
-            scraper = scrape_html(response.text, org_url=url, wild_mode=True)
+            scraper = scrape_html(html, org_url=url, wild_mode=True)
         except Exception:
             host = urlparse(url).netloc
             print(
@@ -203,8 +212,25 @@ def write_file(path: Path, content: str) -> None:
     path.write_text(content, encoding="utf-8")
 
 
-def main(url: str) -> None:
-    scraped = scrape(url)
+def parse_args(argv: list[str]) -> tuple[str, Path | None]:
+    parser = argparse.ArgumentParser(
+        description="Import a recipe from a URL into recipes/<slug>.md."
+    )
+    parser.add_argument("url", help="Recipe page URL")
+    parser.add_argument(
+        "--html",
+        type=Path,
+        default=None,
+        metavar="FILE",
+        help="Parse a locally saved HTML file instead of fetching the URL "
+        "(for sites that block scripted requests)",
+    )
+    args = parser.parse_args(argv)
+    return args.url, args.html
+
+
+def main(url: str, html_path: Path | None = None) -> None:
+    scraped = scrape(url, html_path=html_path)
     if not scraped.get("ingredients"):
         print("Warning: no ingredients found in scrape", file=sys.stderr)
     if not scraped.get("instructions"):
@@ -224,7 +250,5 @@ def main(url: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python scripts/import_recipe.py <url>", file=sys.stderr)
-        sys.exit(1)
-    main(sys.argv[1])
+    cli_url, cli_html = parse_args(sys.argv[1:])
+    main(cli_url, html_path=cli_html)

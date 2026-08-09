@@ -369,9 +369,66 @@ def test_scrape_swallows_per_field_errors(monkeypatch):
     assert result["title"] == "X"
 
 
+def test_scrape_uses_local_html_without_fetching(monkeypatch, tmp_path):
+    """With html_path, scrape() reads the file and never hits the network."""
+    html_file = tmp_path / "page.html"
+    html_file.write_text("<html>recipe page</html>", encoding="utf-8")
+
+    def no_fetch(*a, **kw):
+        raise AssertionError("requests.get must not be called with html_path")
+
+    seen = {}
+
+    def fake_scrape_html(html, org_url, **kw):
+        seen["html"] = html
+        seen["org_url"] = org_url
+        return FakeScraper(title="Local", ingredients=["x"], instructions="Do.")
+
+    monkeypatch.setattr(import_recipe.requests, "get", no_fetch)
+    monkeypatch.setattr(import_recipe, "scrape_html", fake_scrape_html)
+    result = import_recipe.scrape("https://example.com/r", html_path=html_file)
+    assert result["title"] == "Local"
+    assert seen["html"] == "<html>recipe page</html>"
+    assert seen["org_url"] == "https://example.com/r"
+
+
+def test_scrape_local_html_falls_back_to_wild_mode(monkeypatch, tmp_path):
+    from recipe_scrapers._exceptions import WebsiteNotImplementedError
+
+    html_file = tmp_path / "page.html"
+    html_file.write_text("<html>wild</html>", encoding="utf-8")
+    fake = FakeScraper(title="Wild Local", ingredients=[], instructions="")
+
+    def fake_scrape_html(html, org_url, **kw):
+        if not kw.get("wild_mode"):
+            raise WebsiteNotImplementedError("unsupported")
+        assert html == "<html>wild</html>"
+        return fake
+
+    def no_fetch(*a, **kw):
+        raise AssertionError("requests.get must not be called with html_path")
+
+    monkeypatch.setattr(import_recipe.requests, "get", no_fetch)
+    monkeypatch.setattr(import_recipe, "scrape_html", fake_scrape_html)
+    result = import_recipe.scrape("https://example.com/r", html_path=html_file)
+    assert result["title"] == "Wild Local"
+
+
+def test_scrape_exits_1_on_unreadable_html_file(tmp_path, capsys):
+    missing = tmp_path / "nope.html"
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.scrape("https://example.com/r", html_path=missing)
+    assert exc.value.code == 1
+    err = capsys.readouterr().err
+    assert "could not read" in err
+    assert "nope.html" in err
+
+
 def _patch_main_environment(monkeypatch, tmp_path, fake_scraped):
     """Wire up monkeypatches so main() runs against tmp_path with deterministic dates."""
-    monkeypatch.setattr(import_recipe, "scrape", lambda url: fake_scraped)
+    monkeypatch.setattr(
+        import_recipe, "scrape", lambda url, html_path=None: fake_scraped
+    )
     monkeypatch.setattr(import_recipe, "RECIPES_DIR", tmp_path)
     monkeypatch.setattr(import_recipe, "REPO_ROOT", tmp_path.parent)
 
@@ -404,6 +461,52 @@ def test_main_end_to_end(monkeypatch, tmp_path, capsys):
     assert "## Method" in content
     assert "1. Boil water." in content
     assert "created: '2026-05-02'" in content
+
+
+def test_main_passes_html_path_to_scrape(monkeypatch, tmp_path, capsys):
+    fake_scraped = {
+        "title": "Local Stew",
+        "yields": None,
+        "prep_time": None,
+        "cook_time": None,
+        "image": None,
+        "ingredients": ["water"],
+        "instructions": "Boil.",
+    }
+    seen = {}
+
+    def fake_scrape(url, html_path=None):
+        seen["url"] = url
+        seen["html_path"] = html_path
+        return fake_scraped
+
+    _patch_main_environment(monkeypatch, tmp_path, fake_scraped)
+    monkeypatch.setattr(import_recipe, "scrape", fake_scrape)
+    html_file = tmp_path / "saved.html"
+    import_recipe.main("https://example.com/r", html_path=html_file)
+    assert seen["url"] == "https://example.com/r"
+    assert seen["html_path"] == html_file
+    assert (tmp_path / "local-stew.md").exists()
+
+
+def test_parse_args_url_only():
+    url, html_path = import_recipe.parse_args(["https://example.com/r"])
+    assert url == "https://example.com/r"
+    assert html_path is None
+
+
+def test_parse_args_with_html():
+    url, html_path = import_recipe.parse_args(
+        ["https://example.com/r", "--html", "saved.html"]
+    )
+    assert url == "https://example.com/r"
+    assert html_path == Path("saved.html")
+
+
+def test_parse_args_rejects_missing_url(capsys):
+    with pytest.raises(SystemExit) as exc:
+        import_recipe.parse_args([])
+    assert exc.value.code == 2
 
 
 def test_main_warns_on_missing_ingredients(monkeypatch, tmp_path, capsys):
