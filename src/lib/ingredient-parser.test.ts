@@ -131,3 +131,74 @@ describe("parseIngredient — notes and noise parens", () => {
     expect(p.note).toBe("divided");
   });
 });
+
+describe("parseIngredient — parenthetical quantities", () => {
+  it("captures package size for count + paren + container noun", () => {
+    const p = parseIngredient("1 (28 oz / 800 g) can crushed tomatoes");
+    expect(p.quantity).toBe(1);
+    expect(p.unit).toBe("");
+    expect(p.packageSize).toEqual({ value: 800, unit: "g" });
+    expect(p.name).toBe("can crushed tomatoes");
+  });
+
+  it("captures ml package sizes", () => {
+    const p = parseIngredient("1 (14 oz / 400 ml) can full-fat coconut milk");
+    expect(p.packageSize).toEqual({ value: 400, unit: "ml" });
+  });
+
+  it("multiplies later: two cans", () => {
+    const p = parseIngredient("2 (15 oz / 425 g) cans butter beans, drained and rinsed");
+    expect(p.quantity).toBe(2);
+    expect(p.packageSize).toEqual({ value: 425, unit: "g" });
+    expect(p.note).toBe("drained and rinsed");
+  });
+
+  it("treats a paren after qty+unit as a restatement, preferring metric", () => {
+    const p = parseIngredient("1/2 cup (120 ml) low-sodium chicken or vegetable broth");
+    expect(p.unit).toBe("cup");
+    expect(p.restatement).toEqual({ value: 120, unit: "ml" });
+  });
+
+  it("converts imperial-only restatements to metric", () => {
+    const p = parseIngredient("2 tablespoons (about 3/4 ounce; 26 g) light brown sugar");
+    expect(p.restatement).toEqual({ value: 26, unit: "g" });
+  });
+
+  it("captures grams restatements", () => {
+    const p = parseIngredient("1 1/2 lb (680 g) broccoli, cut into bite-sized florets");
+    expect(p.restatement).toEqual({ value: 680, unit: "g" });
+    expect(p.note).toBe("cut into bite-sized florets");
+  });
+
+  it("captures total weight on counted lines", () => {
+    const p = parseIngredient("8 bone-in, skin-on chicken thighs (~2.5 lb / 1.1 kg)");
+    expect(p.totalWeight).toEqual({ grams: 1100, each: false });
+    expect(p.name).toBe("bone-in, skin-on chicken thighs");
+  });
+
+  it("marks per-piece weights with each", () => {
+    const p = parseIngredient("4 salmon fillets (skin-on, ~6 oz / 170 g each)");
+    expect(p.totalWeight).toEqual({ grams: 170, each: true });
+    expect(p.name).toBe("salmon fillets");
+  });
+
+  it("reads mid-line count-plus-weight parens", () => {
+    const p = parseIngredient("3 pounds bone-in, skin-on chicken thighs (8 thighs; 1.3kg)");
+    expect(p.unit).toBe("lb");
+    expect(p.restatement).toEqual({ value: 1300, unit: "g" });
+  });
+
+  it("ignores parens with non-weight measurements", () => {
+    const p = parseIngredient("1 (1-inch / 2.5 cm) piece fresh ginger, finely grated");
+    expect(p.packageSize).toBeNull();
+    expect(p.name).toBe("piece fresh ginger");
+    expect(p.note).toBe("finely grated");
+  });
+
+  it("handles a pint with approximate restatement", () => {
+    const p = parseIngredient("1 pint (~10 oz / 285 g) cherry tomatoes, halved");
+    expect(p.unit).toBe("pint");
+    expect(p.restatement).toEqual({ value: 285, unit: "g" });
+    expect(p.name).toBe("cherry tomatoes");
+  });
+});

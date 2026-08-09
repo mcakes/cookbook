@@ -88,6 +88,31 @@ function splitNote(rest: string): { name: string; note: string } {
   return { name: rest, note: "" };
 }
 
+/** Parse "(14 oz / 400 g)"-style contents into a single metric quantity; metric wins. */
+export function parseParenQuantities(inner: string): MetricQuantity | null {
+  let mass: number | null = null;
+  let massIsMetric = false;
+  let volume: number | null = null;
+  let volumeIsMetric = false;
+  for (const seg of inner.split(/[/;,]/)) {
+    const cleaned = seg.replace(/\b(about|approx\.?|total|each)\b/gi, "").replace(/~/g, "").trim();
+    const m = cleaned.match(new RegExp(`^(${NUM})\\s*(${UNIT_ALT})\\b`, "i"));
+    if (!m) continue;
+    const value = evalNumber(m[1]);
+    const unit = UNIT_SYNONYMS[m[2].toLowerCase()];
+    if (unit in MASS_TO_G) {
+      const metric = unit === "g" || unit === "kg";
+      if (mass === null || (metric && !massIsMetric)) { mass = value * MASS_TO_G[unit]; massIsMetric = metric; }
+    } else if (unit in VOL_TO_ML) {
+      const metric = unit === "ml" || unit === "l";
+      if (volume === null || (metric && !volumeIsMetric)) { volume = value * VOL_TO_ML[unit]; volumeIsMetric = metric; }
+    }
+  }
+  if (mass !== null && (massIsMetric || !volumeIsMetric)) return { value: mass, unit: "g" };
+  if (volume !== null) return { value: volume, unit: "ml" };
+  return null;
+}
+
 export function parseIngredient(text: string): ParsedIngredient {
   const original = text;
   let rest = text.trim();
@@ -95,9 +120,9 @@ export function parseIngredient(text: string): ParsedIngredient {
   let quantityMax: number | null = null;
   let unit = "";
   let unitRaw = "";
-  const packageSize: MetricQuantity | null = null;
-  const restatement: MetricQuantity | null = null;
-  const totalWeight: ParsedIngredient["totalWeight"] = null;
+  let packageSize: MetricQuantity | null = null;
+  let restatement: MetricQuantity | null = null;
+  let totalWeight: ParsedIngredient["totalWeight"] = null;
 
   const attached = rest.match(new RegExp(`^(\\d+(?:\\.\\d+)?)(${UNIT_ALT})\\b\\s*(.*)$`, "i"));
   if (attached) {
@@ -111,17 +136,40 @@ export function parseIngredient(text: string): ParsedIngredient {
       quantity = evalNumber(q[1]);
       quantityMax = q[2] ? evalNumber(q[2]) : null;
       rest = q[3];
+      // Package-size paren straight after the count: "1 (14 oz / 400 g) can …"
+      const pkg = rest.match(/^\(([^)]*)\)\s*(.*)$/);
+      if (pkg) {
+        packageSize = parseParenQuantities(pkg[1]);   // null → noise, still consumed
+        rest = pkg[2];
+      }
       const u = rest.match(new RegExp(`^(${UNIT_ALT})\\b\\s*(.*)$`, "i"));
       if (u) {
         unitRaw = u[1];
         unit = UNIT_SYNONYMS[u[1].toLowerCase()];
         rest = u[2];
+        // Restatement paren straight after the unit: "1/2 cup (120 ml) …"
+        const re = rest.match(/^\(([^)]*)\)\s*(.*)$/);
+        if (re) {
+          restatement = parseParenQuantities(re[1]);
+          rest = re[2];
+        }
       }
     }
   }
 
-  // Remaining parens are noise at this stage — strip from the name.
-  rest = rest.replace(/\s*\([^)]*\)/g, "");
+  // Remaining parens: total weight on counted lines, restatement after a unit,
+  // noise otherwise. All are removed from the name.
+  rest = rest.replace(/\s*\(([^)]*)\)/g, (_whole, inner: string) => {
+    const parsed = parseParenQuantities(inner);
+    if (parsed) {
+      if (quantity !== null && unit === "" && totalWeight === null && parsed.unit === "g") {
+        totalWeight = { grams: parsed.value, each: /\beach\b/i.test(inner) };
+      } else if (unit !== "" && restatement === null) {
+        restatement = parsed;
+      }
+    }
+    return "";
+  });
 
   const { name: rawName, note } = splitNote(rest);
   const name = rawName.replace(/\s+/g, " ").trim().replace(/,+$/, "");
