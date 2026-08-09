@@ -178,3 +178,45 @@ export function parseIngredient(text: string): ParsedIngredient {
     packageSize, restatement, totalWeight, name, note,
   };
 }
+
+const SIZE_ADJECTIVES = new Set(["large", "medium", "small"]);
+const PIECE_NOUNS = new Set([
+  "clove", "cloves", "head", "heads", "bunch", "bunches", "cob", "cobs",
+  "block", "blocks", "can", "cans", "piece", "pieces", "sprig", "sprigs",
+  "stalk", "stalks", "handful", "handfuls",
+]);
+
+function singularise(w: string): string {
+  if (w.length <= 3 || w.endsWith("ss") || w.endsWith("us") || w.endsWith("is")) return w;
+  if (w.endsWith("ies")) return w.slice(0, -3) + "y";
+  if (w.endsWith("ves")) return w.slice(0, -3) + "f";
+  if (w.endsWith("oes")) return w.slice(0, -2);
+  if (/(ches|shes|xes|zes)$/.test(w)) return w.slice(0, -2);
+  if (w.endsWith("s")) return w.slice(0, -1);
+  return w;
+}
+
+/** Stable mapping/aggregation key: the ingredient's core identity. */
+export function coreNameKey(input: string | ParsedIngredient): string {
+  const parsed = typeof input === "string" ? parseIngredient(input) : input;
+  let words = parsed.name
+    .normalize("NFC")
+    .toLowerCase()
+    .replace(/[(),]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  while (
+    words.length > 1 &&
+    (SIZE_ADJECTIVES.has(words[0]) || PIECE_NOUNS.has(words[0]) || words[0] === "of")
+  ) {
+    words = words.slice(1);
+  }
+  const orIdx = words.indexOf("or");
+  if (orIdx > 0) words = words.slice(0, orIdx);
+  words = words.map((w) => (w === "dry" ? "dried" : w));
+  if (words.length > 0) {
+    words[words.length - 1] = singularise(words[words.length - 1]);
+  }
+  return words.join(" ");
+}
