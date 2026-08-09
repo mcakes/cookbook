@@ -12,5 +12,10 @@
     "foodId": "fdc:170938",
     "confirmed": true,
     "source": "manual"
+  },
+  "dried oregano": {
+    "foodId": "fdc:171328",
+    "confirmed": true,
+    "source": "manual"
   }
 }
