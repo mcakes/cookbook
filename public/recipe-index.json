@@ -251,10 +251,13 @@
   {
     "title": "Sheet-Pan Chicken Marbella",
     "slug": "sheet-pan-chicken-marbella",
-    "tags": [],
-    "rating": null,
+    "tags": [
+      "chicken",
+      "sweet & briny"
+    ],
+    "rating": 5,
     "servings": 6,
-    "prep_time": 7,
+    "prep_time": 60,
     "cook_time": 40,
     "ingredients": [
       "1/4 cup (60 ml) extra-virgin olive oil",
