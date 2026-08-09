@@ -59,7 +59,7 @@ const COMMON_FRACTIONS: [number, string][] = [
 ];
 
 export function formatQuantity(n: number): string {
-  if (Math.round(n) > 0 && Math.abs(n - Math.round(n)) < 0.05) return String(Math.round(n));
+  if (Math.round(n) > 0 && Math.abs(n - Math.round(n)) < 0.1) return String(Math.round(n));
   const intPart = Math.floor(n);
   const fracPart = n - intPart;
   for (const [val, str] of COMMON_FRACTIONS) {
