@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useRecipeIndex } from "../hooks/useRecipeIndex";
 import { createSearchIndex, textSearch, ingredientSearch } from "../lib/search";
+import { parseIngredient } from "../lib/ingredient-parser";
 import SearchBar from "../components/SearchBar";
 import IngredientSearch from "../components/IngredientSearch";
 import StarRating from "../components/StarRating";
@@ -29,7 +30,7 @@ export default function SearchPage() {
   const allIngredients = useMemo(() => {
     const set = new Set<string>();
     index.forEach((r) => r.ingredients.forEach((i) => {
-      const name = i.replace(/^[\d\s/]+\s*(g|kg|ml|l|tsp|tbsp|cups?|oz|lbs?|pinch)?\s*/i, "").trim();
+      const name = parseIngredient(i).name.trim();
       if (name) set.add(name.toLowerCase());
     }));
     return Array.from(set).sort();

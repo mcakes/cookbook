@@ -1,16 +1,16 @@
 // src/lib/nutrition.ts
+import Fuse from "fuse.js";
+import {
+  parseIngredient, coreNameKey, MASS_TO_G, VOL_TO_ML,
+  type ParsedIngredient,
+} from "./ingredient-parser";
+import type {
+  Food, IngredientMapping, NutritionRow, NutritionTotals, Mappings,
+} from "./nutrition-types";
+
 export function normaliseKey(s: string): string {
   return s.normalize("NFC").trim().toLowerCase().replace(/\s+/g, " ");
 }
-
-import type { Food, IngredientMapping } from "./nutrition-types";
-
-const MASS_TO_G: Record<string, number> = {
-  g: 1, kg: 1000, oz: 28.3495, lb: 453.592, lbs: 453.592,
-};
-const VOL_TO_ML: Record<string, number> = {
-  ml: 1, l: 1000, tsp: 4.92892, tbsp: 14.7868, cup: 236.588, cups: 236.588,
-};
 
 export interface ResolveResult {
   grams: number | null;
@@ -18,38 +18,49 @@ export interface ResolveResult {
 }
 
 export function resolveGrams(
-  parsed: { quantity: number | null; unit: string },
+  parsed: ParsedIngredient,
   food: Food,
   mapping: IngredientMapping | undefined
 ): ResolveResult {
+  const mlToGrams = (ml: number): ResolveResult =>
+    food.density_g_per_ml !== undefined
+      ? { grams: ml * food.density_g_per_ml }
+      : { grams: ml, approximate: true };
+  const metric = (q: { value: number; unit: "g" | "ml" }): ResolveResult =>
+    q.unit === "g" ? { grams: q.value } : mlToGrams(q.value);
+
+  // 1. Author-stated restatement is the most precise source.
+  if (parsed.restatement) return metric(parsed.restatement);
+
   if (parsed.quantity === null) return { grams: null };
 
-  const unit = parsed.unit.toLowerCase();
+  // 2. Package size × count.
+  if (parsed.packageSize) {
+    return metric({
+      value: parsed.packageSize.value * parsed.quantity,
+      unit: parsed.packageSize.unit,
+    });
+  }
 
-  // 1. Mass
-  if (unit in MASS_TO_G) {
-    return { grams: parsed.quantity * MASS_TO_G[unit] };
+  // 3. Canonical unit conversion.
+  if (parsed.unit in MASS_TO_G) return { grams: parsed.quantity * MASS_TO_G[parsed.unit] };
+  if (parsed.unit in VOL_TO_ML) return mlToGrams(parsed.quantity * VOL_TO_ML[parsed.unit]);
+
+  // 4. Per-piece: override → weight stated on the line → food default.
+  // A hand-confirmed pieceOverride is trusted over the line's own stated
+  // weight — someone has already verified it against the food actually used.
+  if (mapping?.pieceOverride) return { grams: parsed.quantity * mapping.pieceOverride.grams };
+  if (parsed.totalWeight) {
+    return {
+      grams: parsed.totalWeight.each
+        ? parsed.totalWeight.grams * parsed.quantity
+        : parsed.totalWeight.grams,
+    };
   }
-  // 2. Volume with density
-  if (unit in VOL_TO_ML) {
-    const ml = parsed.quantity * VOL_TO_ML[unit];
-    if (food.density_g_per_ml !== undefined) {
-      return { grams: ml * food.density_g_per_ml };
-    }
-    // 3. Volume fallback (water-equivalent)
-    return { grams: ml, approximate: true };
-  }
-  // 4. Per-piece (override beats default)
-  const piece = mapping?.pieceOverride ?? food.defaultPiece;
-  if (piece) {
-    // Accept any unit (or empty unit) when a piece weight is configured.
-    // The recipe-author's chosen unit is the count multiplier.
-    return { grams: parsed.quantity * piece.grams };
-  }
+  if (food.defaultPiece) return { grams: parsed.quantity * food.defaultPiece.grams };
+
   return { grams: null };
 }
-
-import Fuse from "fuse.js";
 
 export interface AutoMatchResult {
   foodId: string;
@@ -62,15 +73,16 @@ const FUSE_OPTIONS = {
   keys: ["aliases", "name"],
 };
 
+let fuseCache: { foods: Food[]; fuse: Fuse<Food> } | null = null;
+
 export function autoMatch(key: string, foods: Food[]): AutoMatchResult | null {
-  const fuse = new Fuse(foods, FUSE_OPTIONS);
-  const [best] = fuse.search(key, { limit: 1 });
+  if (!fuseCache || fuseCache.foods !== foods) {
+    fuseCache = { foods, fuse: new Fuse(foods, FUSE_OPTIONS) };
+  }
+  const [best] = fuseCache.fuse.search(key, { limit: 1 });
   if (!best || best.score === undefined || best.score > 0.3) return null;
   return { foodId: best.item.id, confidence: 1 - best.score };
 }
-
-import { parseQuantity } from "./scaling";
-import type { NutritionRow, NutritionTotals, Mappings } from "./nutrition-types";
 
 const ZERO_TOTALS = (): NutritionTotals => ({
   kcal: 0, protein_g: 0, fat_g: 0, sat_fat_g: 0,
@@ -88,10 +100,9 @@ export function computeRecipeNutrition(
   const totals = ZERO_TOTALS();
 
   for (const ingredient of ingredients) {
-    const parsed = parseQuantity(ingredient);
-    const key = normaliseKey(parsed.rest);
-    const explicit = mappings[key];
-    let mapping = explicit;
+    const parsed = parseIngredient(ingredient);
+    const key = coreNameKey(parsed);
+    let mapping = mappings[key];
 
     if (!mapping) {
       const auto = autoMatch(key, foods);
@@ -132,14 +143,14 @@ export function computeRecipeNutrition(
 
     const factor = grams / 100;
     const values: NutritionRow["values"] = {
-      kcal:        food.per100g.kcal        * factor,
-      protein_g:   food.per100g.protein_g   * factor,
-      fat_g:       food.per100g.fat_g       * factor,
-      sat_fat_g:   food.per100g.sat_fat_g   * factor,
-      carbs_g:     food.per100g.carbs_g     * factor,
-      sugar_g:     food.per100g.sugar_g     * factor,
-      fibre_g:     food.per100g.fibre_g     * factor,
-      sodium_mg:   food.per100g.sodium_mg   * factor,
+      kcal:      food.per100g.kcal      * factor,
+      protein_g: food.per100g.protein_g * factor,
+      fat_g:     food.per100g.fat_g     * factor,
+      sat_fat_g: food.per100g.sat_fat_g * factor,
+      carbs_g:   food.per100g.carbs_g   * factor,
+      sugar_g:   food.per100g.sugar_g   * factor,
+      fibre_g:   food.per100g.fibre_g   * factor,
+      sodium_mg: food.per100g.sodium_mg * factor,
     };
     rows.push({
       ingredient, key,
