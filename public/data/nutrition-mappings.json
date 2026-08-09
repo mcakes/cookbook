@@ -22,5 +22,14 @@
     "foodId": "fdc:2259794",
     "confirmed": true,
     "source": "manual"
+  },
+  "tomato": {
+    "foodId": "fdc:170457",
+    "confirmed": true,
+    "source": "manual",
+    "pieceOverride": {
+      "unit": "",
+      "grams": 150
+    }
   }
 }
