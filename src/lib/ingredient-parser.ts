@@ -185,11 +185,14 @@ const PIECE_NOUNS = new Set([
   "block", "blocks", "can", "cans", "piece", "pieces", "sprig", "sprigs",
   "stalk", "stalks", "handful", "handfuls",
 ]);
+const VES_IRREGULARS = new Set([
+  "leaves", "halves", "loaves", "knives", "calves", "shelves", "wives", "thieves", "scarves",
+]);
 
 function singularise(w: string): string {
   if (w.length <= 3 || w.endsWith("ss") || w.endsWith("us") || w.endsWith("is")) return w;
   if (w.endsWith("ies")) return w.slice(0, -3) + "y";
-  if (w.endsWith("ves")) return w.slice(0, -3) + "f";
+  if (VES_IRREGULARS.has(w)) return w.slice(0, -3) + "f";
   if (w.endsWith("oes")) return w.slice(0, -2);
   if (/(ches|shes|xes|zes)$/.test(w)) return w.slice(0, -2);
   if (w.endsWith("s")) return w.slice(0, -1);
