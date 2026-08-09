@@ -15,8 +15,9 @@ interface Group {
 function pickUnit(g: Group, table: Record<string, number>): string {
   const candidates = [...g.unitVotes.entries()].filter(([u]) => u in table);
   if (candidates.length === 0) return table === MASS_TO_G ? "g" : "ml";
-  // Most votes first; ties broken by the larger unit.
-  candidates.sort((a, b) => b[1] - a[1] || table[b[0]] - table[a[0]]);
+  // Most votes first; ties broken by the smaller unit — "7 tbsp" reads
+  // better on a shopping list than "0.44 cup".
+  candidates.sort((a, b) => b[1] - a[1] || table[a[0]] - table[b[0]]);
   return candidates[0][0];
 }
 

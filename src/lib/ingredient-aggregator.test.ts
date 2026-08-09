@@ -29,9 +29,16 @@ describe("aggregateIngredients", () => {
     ])).toEqual(["10 tbsp extra-virgin olive oil"]);
   });
 
-  it("merges attached metric units, ties broken by the larger unit", () => {
+  it("merges attached metric units, ties broken by the smaller unit", () => {
     expect(aggregateIngredients(["200g pasta", "1/2 kg pasta"]))
-      .toEqual(["0.7 kg pasta"]);
+      .toEqual(["700 g pasta"]);
+  });
+
+  it("prefers the smaller unit on cross-recipe ties", () => {
+    expect(aggregateIngredients([
+      "3 tablespoons extra-virgin olive oil, divided",
+      "1/4 cup (60 ml) extra-virgin olive oil",
+    ])).toEqual(["7 tbsp extra-virgin olive oil"]);
   });
 
   it("keeps counts and masses of the same ingredient on separate lines", () => {
