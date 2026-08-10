@@ -36,5 +36,10 @@
     "foodId": "fdc:321360",
     "confirmed": true,
     "source": "manual"
+  },
+  "sherry vinegar": {
+    "foodId": "fdc:172237",
+    "confirmed": true,
+    "source": "manual"
   }
 }
