@@ -41,5 +41,10 @@
     "foodId": "fdc:172237",
     "confirmed": true,
     "source": "manual"
+  },
+  "english cucumber": {
+    "foodId": "fdc:2346406",
+    "confirmed": true,
+    "source": "manual"
   }
 }
