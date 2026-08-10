@@ -18,9 +18,11 @@ ingredients:
   - 1/2 tsp black pepper
   - 4 cup neutral oil (for frying)
   - Greek yogurt (for serving)
-cook_log: []
+cook_log:
+  - date: '2026-08-09'
+    notes: 'Batter was far too runny. Pulsing Tomato pulverized it. '
 created: '2026-08-09'
-updated: '2026-08-09'
+updated: '2026-08-10'
 ---
 
 1. For the Batter: Coarsely chop 8 ounces tomatoes (about 2 tomatoes) and either gently pulse in blender or food processor until just combined or shred on large holes of box grater set over a bowl, flesh side facing the blades.
