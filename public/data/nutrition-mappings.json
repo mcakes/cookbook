@@ -31,5 +31,10 @@
       "unit": "",
       "grams": 150
     }
+  },
+  "mixed cherry tomato": {
+    "foodId": "fdc:321360",
+    "confirmed": true,
+    "source": "manual"
   }
 }
