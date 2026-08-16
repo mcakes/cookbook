@@ -9,25 +9,25 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen">
-      <header className="bg-paper border-b border-line">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="font-display text-2xl font-medium text-ink tracking-tight">
-            Cookbook
+      <header>
+        <div className="max-w-6xl mx-auto px-4 pt-6 pb-4 flex items-baseline justify-between border-b border-line">
+          <Link to="/" className="font-display text-2xl text-ink tracking-tight">
+            Cook<span className="italic text-accent">book</span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
-            <Link to="/" className="text-muted hover:text-ink transition-colors">
+          <nav className="flex items-baseline gap-6">
+            <Link to="/" className="text-[11px] uppercase tracking-[0.14em] text-muted hover:text-ink transition-colors">
               Browse
             </Link>
-            <Link to="/search" className="text-muted hover:text-ink transition-colors">
+            <Link to="/search" className="text-[11px] uppercase tracking-[0.14em] text-muted hover:text-ink transition-colors">
               Search
             </Link>
-            <Link to="/meal-planner" className="text-muted hover:text-ink transition-colors">
+            <Link to="/meal-planner" className="text-[11px] uppercase tracking-[0.14em] text-muted hover:text-ink transition-colors">
               Meal Planner
             </Link>
             {authenticated && (
               <Link
                 to="/new"
-                className="bg-accent text-paper px-3 py-1.5 rounded text-sm hover:bg-accent-hover transition-colors"
+                className="bg-accent text-paper px-3 py-1.5 rounded text-[11px] uppercase tracking-[0.14em] hover:bg-accent-hover transition-colors"
               >
                 + New Recipe
               </Link>
@@ -39,7 +39,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <footer className="border-t border-line mt-16">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between text-sm text-muted">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between text-[11px] uppercase tracking-[0.14em] text-muted">
           <span>Cookbook</span>
           <button
             onClick={() => (authenticated ? logout() : setShowAuth(true))}
