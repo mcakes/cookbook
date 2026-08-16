@@ -28,15 +28,15 @@ export default function NutritionPanel({ rows: _rows, totals }: Props) {
     : totals;
 
   return (
-    <section className="bg-paper border border-line rounded-md p-5 mb-6" aria-label="Nutrition">
+    <section className="bg-paper border border-panel-line rounded-md p-5 mb-6" aria-label="Nutrition">
       <header className="flex items-center justify-between mb-3">
-        <h2 className="font-display text-base font-medium text-ink">
+        <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">
           {mode === "per-serving" ? `Per serving (${servings})` : "Per recipe"}
         </h2>
         {canPerServing && (
           <button
             onClick={() => setMode(mode === "per-serving" ? "per-recipe" : "per-serving")}
-            className="text-xs text-muted hover:text-ink"
+            className="text-xs text-muted hover:text-accent transition-colors"
           >
             {mode === "per-serving" ? "Per recipe ▾" : "Per serving ▾"}
           </button>

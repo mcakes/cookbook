@@ -11,7 +11,7 @@ export default function CookLog({ entries }: CookLogProps) {
 
   return (
     <div>
-      <h2 className="font-display text-lg font-medium text-ink mb-4 pb-2 border-b border-line">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-accent mb-4 pb-2 border-b border-line">
         Cook Log
       </h2>
       <div className="space-y-3">
