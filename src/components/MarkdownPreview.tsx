@@ -13,8 +13,9 @@ export default function MarkdownPreview({ content }: MarkdownPreviewProps) {
         prose-p:text-ink prose-p:leading-relaxed
         prose-a:text-accent hover:prose-a:text-accent-hover
         prose-strong:text-ink
-        prose-code:bg-tag prose-code:text-tag-ink prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
-        prose-li:text-ink"
+        prose-code:bg-wash prose-code:text-tag-ink prose-code:px-1 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+        prose-li:text-ink
+        [&_ol>li::marker]:text-accent [&_ol>li::marker]:font-display [&_ol>li::marker]:italic"
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
     </div>
