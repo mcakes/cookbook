@@ -10,11 +10,11 @@ export default function Layout() {
   return (
     <div className="min-h-screen">
       <header>
-        <div className="max-w-6xl mx-auto px-4 pt-6 pb-4 flex items-baseline justify-between border-b border-line">
+        <div className="max-w-6xl mx-auto px-4 pt-6 pb-4 flex items-baseline justify-between gap-x-6 border-b border-line">
           <Link to="/" className="font-display text-2xl text-ink tracking-tight">
             Cook<span className="italic text-accent">book</span>
           </Link>
-          <nav className="flex items-baseline gap-6">
+          <nav className="flex flex-wrap items-baseline justify-end gap-x-6 gap-y-2">
             <Link to="/" className="text-[11px] uppercase tracking-[0.14em] text-muted hover:text-ink transition-colors">
               Browse
             </Link>
