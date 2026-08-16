@@ -30,6 +30,14 @@ export default function HomePage() {
 
   return (
     <div>
+      <div className="flex items-end justify-between gap-6 border-b border-line pb-6 mb-8">
+        <h1 className="font-display text-4xl md:text-5xl font-light text-ink tracking-tight leading-[1.08]">
+          What are we <span className="italic text-accent">cooking</span> tonight?
+        </h1>
+        <span className="hidden sm:block text-[11px] uppercase tracking-[0.16em] text-muted whitespace-nowrap pb-1.5">
+          {index.length} {index.length === 1 ? "recipe" : "recipes"}
+        </span>
+      </div>
       <div className="mb-6">
         <input
           type="text"
