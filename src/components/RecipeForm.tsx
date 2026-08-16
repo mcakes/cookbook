@@ -89,7 +89,7 @@ export default function RecipeForm({
         <label className="block text-sm font-medium text-ink mb-1">Tags</label>
         <div className="flex flex-wrap gap-1.5 mb-2">
           {tags.map((tag) => (
-            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-tag text-tag-ink cursor-pointer hover:bg-tag hover:text-danger" onClick={() => removeTag(tag)}>
+            <span key={tag} className="text-xs px-2.5 py-0.5 rounded-full border border-line text-tag-ink cursor-pointer hover:border-danger hover:text-danger transition-colors" onClick={() => removeTag(tag)}>
               {tag} ×
             </span>
           ))}
@@ -105,7 +105,7 @@ export default function RecipeForm({
         <div className="flex gap-2 mb-2">
           <input type="date" value={newLogDate} onChange={(e) => setNewLogDate(e.target.value)} className="bg-field border border-line rounded-md px-3 py-1.5 text-sm" />
           <input type="text" value={newLogNotes} onChange={(e) => setNewLogNotes(e.target.value)} placeholder="Notes (optional)" className="flex-1 bg-field border border-line rounded-md px-3 py-1.5 text-sm" />
-          <button type="button" onClick={addCookLogEntry} className="text-sm bg-tag hover:bg-line px-3 py-1.5 rounded-md">Log</button>
+          <button type="button" onClick={addCookLogEntry} className="text-sm border border-line text-tag-ink hover:border-accent hover:text-accent px-3 py-1.5 rounded-full transition-colors">Log</button>
         </div>
         {cookLog.length > 0 && (
           <div className="text-sm text-muted space-y-1">
