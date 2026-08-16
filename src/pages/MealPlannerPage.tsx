@@ -68,17 +68,17 @@ export default function MealPlannerPage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Meal Planner</h1>
-        <button onClick={handleClear} className="text-sm text-muted hover:text-danger">
+      <div className="flex items-end justify-between border-b border-line pb-4 mb-8">
+        <h1 className="font-display text-3xl text-ink tracking-tight">Meal Planner</h1>
+        <button onClick={handleClear} className="text-[11px] uppercase tracking-[0.14em] text-muted hover:text-danger transition-colors">
           Clear week
         </button>
       </div>
 
       <div className="grid grid-cols-7 gap-2 mb-8">
         {DAYS.map((day) => (
-          <div key={day} className="bg-paper rounded-lg p-3 shadow-sm min-h-[120px]">
-            <h3 className="font-semibold text-sm text-muted mb-2">{DAY_LABELS[day]}</h3>
+          <div key={day} className="bg-paper border border-panel-line rounded-md p-3 min-h-[120px]">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted mb-2">{DAY_LABELS[day]}</h3>
             <div className="space-y-1">
               {plan.days[day].map((slug, i) => (
                 <div key={i} className="text-xs flex justify-between items-start group">
@@ -115,7 +115,7 @@ export default function MealPlannerPage() {
                     <button
                       key={r.slug}
                       onClick={() => addRecipe(day, r.slug)}
-                      className="block w-full text-left text-xs px-2 py-1 hover:bg-tag"
+                      className="block w-full text-left text-xs px-2 py-1 hover:bg-wash"
                     >
                       {r.title}
                     </button>
