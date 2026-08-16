@@ -9,8 +9,8 @@ export default function TagList({ tags, onTagClick }: TagListProps) {
       {tags.map((tag) => (
         <span
           key={tag}
-          className={`text-xs px-2.5 py-0.5 rounded-full bg-tag text-tag-ink tracking-wide ${
-            onTagClick ? "cursor-pointer hover:bg-line" : ""
+          className={`text-xs px-2.5 py-0.5 rounded-full border border-line text-tag-ink tracking-wide ${
+            onTagClick ? "cursor-pointer hover:border-accent hover:text-accent transition-colors" : ""
           }`}
           onClick={() => onTagClick?.(tag)}
         >

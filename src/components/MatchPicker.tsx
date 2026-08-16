@@ -57,8 +57,8 @@ export default function MatchPicker({ mappingKey, foods, onSave, onClose }: Prop
             <li key={food.id}>
               <button
                 onClick={() => setSelectedId(food.id)}
-                className={`w-full text-left px-2 py-1 text-sm hover:bg-tag ${
-                  selectedId === food.id ? "bg-tag" : ""
+                className={`w-full text-left px-2 py-1 text-sm hover:bg-wash ${
+                  selectedId === food.id ? "bg-wash" : ""
                 }`}
               >
                 {food.name}
@@ -86,7 +86,7 @@ export default function MatchPicker({ mappingKey, foods, onSave, onClose }: Prop
           <button
             onClick={handleConfirm}
             disabled={!selectedId}
-            className="text-sm px-3 py-1 border border-line rounded bg-tag disabled:opacity-50"
+            className="text-sm px-3 py-1 border border-line rounded bg-wash disabled:opacity-50"
           >
             Confirm match
           </button>

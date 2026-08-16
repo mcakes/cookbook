@@ -2,19 +2,21 @@
 @plugin "@tailwindcss/typography";
 
 @theme inline {
-  --color-bg: #F7F5EF;
-  --color-paper: #FBFAF5;
-  --color-ink: #1F2A20;
-  --color-muted: #7A8473;
-  --color-accent: #6B7F5C;
-  --color-accent-hover: #5A6E4D;
-  --color-tag: #E6E9DD;
-  --color-tag-ink: #4A5A40;
-  --color-line: #E6E9DD;
-  --color-field: #FDFCF6;
+  --color-bg: #F6F1E7;
+  --color-paper: #FBF7EE;
+  --color-ink: #2C2820;
+  --color-muted: #8A7F6A;
+  --color-accent: #B4552D;
+  --color-accent-hover: #9A4623;
+  --color-olive: #6B7F5C;
+  --color-line: #D9CFBB;
+  --color-panel-line: #E4DAC6;
+  --color-tag-ink: #6E5B3F;
+  --color-wash: #EFE7D6;
+  --color-field: #FBF7EE;
   --color-danger: #B5443A;
 
-  --font-display: "Newsreader", Georgia, serif;
+  --font-display: "Fraunces", Georgia, serif;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
@@ -40,7 +42,7 @@
     --color-fg-subtle: var(--color-muted);
     --color-accent-fg: var(--color-accent);
     --color-accent-emphasis: var(--color-accent);
-    --color-neutral-muted: var(--color-tag);
+    --color-neutral-muted: var(--color-wash);
   }
 }
 
@@ -64,5 +66,5 @@
 
 [data-color-mode="light"] .w-md-editor-toolbar li > button:hover {
   color: var(--color-ink);
-  background-color: var(--color-tag);
+  background-color: var(--color-wash);
 }

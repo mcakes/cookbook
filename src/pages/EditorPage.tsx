@@ -147,7 +147,7 @@ export default function EditorPage() {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">
+        <h1 className="font-display text-3xl text-ink tracking-tight">
           {isNew ? "New Recipe" : `Edit: ${title}`}
         </h1>
         <div className="flex gap-2">
@@ -167,7 +167,7 @@ export default function EditorPage() {
       </div>
 
       {saveError && (
-        <div className="bg-tag border border-line text-danger px-4 py-3 rounded-md mb-4">
+        <div className="bg-paper border border-danger text-danger px-4 py-3 rounded-md mb-4">
           {saveError}
         </div>
       )}

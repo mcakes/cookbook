@@ -115,7 +115,7 @@ export default function ShoppingList({ derivedItems }: ShoppingListProps) {
   if (!snapshot) {
     return (
       <div>
-        <h2 className="text-lg font-semibold mb-3">Shopping List</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-accent mb-3">Shopping List</h2>
         <ul className="space-y-1.5">
           {derivedItems.map((item, i) => (
             <li key={i} className="flex items-center gap-2">
@@ -143,7 +143,7 @@ export default function ShoppingList({ derivedItems }: ShoppingListProps) {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-3">Shopping List</h2>
+      <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-accent mb-3">Shopping List</h2>
       <ul className="space-y-1.5">
         {snapshot.items.map((item) => (
           <li key={item.id} className="flex items-center gap-2 group">
@@ -218,13 +218,13 @@ export default function ShoppingList({ derivedItems }: ShoppingListProps) {
       <div className="mt-4 flex items-center gap-3">
         <button
           onClick={() => copy("text")}
-          className="px-3 py-1.5 bg-tag rounded text-sm hover:bg-line"
+          className="px-3 py-1.5 border border-line text-tag-ink rounded-full text-xs hover:border-accent hover:text-accent transition-colors"
         >
           {copied === "text" ? "Copied!" : "Copy as text"}
         </button>
         <button
           onClick={() => copy("markdown")}
-          className="px-3 py-1.5 bg-tag rounded text-sm hover:bg-line"
+          className="px-3 py-1.5 border border-line text-tag-ink rounded-full text-xs hover:border-accent hover:text-accent transition-colors"
         >
           {copied === "markdown" ? "Copied!" : "Copy as markdown"}
         </button>

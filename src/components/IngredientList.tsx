@@ -19,6 +19,15 @@ function rowSubline(row: NutritionRow): string {
   return `${fmt(v.kcal)} kcal · ${fmt(v.protein_g, 1)} g P · ${fmt(v.fat_g, 1)} g F · ${fmt(v.carbs_g, 1)} g C`;
 }
 
+const LEADING_QTY =
+  /^([\d¼½¾⅓⅔⅛][\d\s/.,¼½¾⅓⅔⅛×x-]*(?:(?:g|kg|ml|l|tsp|tbsp|cups?)\b)?)\s+(.+)$/i;
+
+export function splitLeadingQuantity(text: string): { qty: string; rest: string } {
+  const m = text.match(LEADING_QTY);
+  if (!m) return { qty: "", rest: text };
+  return { qty: m[1].trim(), rest: m[2] };
+}
+
 export default function IngredientList({
   ingredients, nutritionRows, onEditMatch, canEdit,
 }: IngredientListProps) {
@@ -34,15 +43,15 @@ export default function IngredientList({
   return (
     <div>
       <div className="flex items-center justify-between gap-3 mb-4 pb-2 border-b border-line">
-        <h2 className="font-display text-lg font-medium text-ink">Ingredients</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Ingredients</h2>
         {showScaler && (
-          <div className="flex items-center gap-2 text-sm text-muted">
+          <div className="flex items-center gap-2 border border-line rounded-full px-2 py-0.5 text-xs text-tag-ink">
             <button onClick={() => setServings(Math.max(1, servings - 1))}
-              className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
+              className="w-5 h-5 flex items-center justify-center hover:text-accent transition-colors"
               aria-label="Fewer servings">−</button>
             <span className="text-ink tabular-nums">{servings} servings</span>
             <button onClick={() => setServings(servings + 1)}
-              className="w-6 h-6 rounded-full border border-line flex items-center justify-center hover:bg-tag transition-colors"
+              className="w-5 h-5 flex items-center justify-center hover:text-accent transition-colors"
               aria-label="More servings">+</button>
           </div>
         )}
@@ -52,12 +61,22 @@ export default function IngredientList({
           const row = nutritionRows?.[i];
           return (
             <li key={i} className="text-ink">
-              <div>{ingredient}</div>
+              <IngredientLine text={ingredient} />
               {row && <Subline row={row} factor={factor} canEdit={!!canEdit} onEditMatch={onEditMatch} />}
             </li>
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+function IngredientLine({ text }: { text: string }) {
+  const { qty, rest } = splitLeadingQuantity(text);
+  if (!qty) return <div>{text}</div>;
+  return (
+    <div>
+      <span className="font-semibold">{qty}</span> {rest}
     </div>
   );
 }

@@ -82,7 +82,7 @@ export default function RecipePage() {
     <ServingsProvider baseServings={recipe.servings}>
     <article className="max-w-5xl mx-auto">
       {recipe.image && (
-        <div className="aspect-video rounded-md overflow-hidden mb-8 border border-line">
+        <div className="aspect-video md:aspect-[21/8] rounded-md overflow-hidden mb-8">
           <img
             src={github.imageUrl(recipe.image)}
             alt={recipe.title}
@@ -92,20 +92,20 @@ export default function RecipePage() {
       )}
 
       <div className="flex items-start justify-between gap-4 mb-3">
-        <h1 className="font-display text-3xl md:text-4xl font-medium text-ink leading-tight tracking-tight">
+        <h1 className="font-display text-3xl md:text-4xl text-ink leading-tight tracking-tight">
           {recipe.title}
         </h1>
         {authenticated && (
           <Link
             to={`/edit/${recipe.slug}`}
-            className="bg-paper border border-line text-ink px-3 py-1.5 rounded text-sm hover:bg-tag transition-colors shrink-0"
+            className="border border-line text-tag-ink rounded-full px-3 py-1.5 text-xs hover:border-accent hover:text-accent transition-colors shrink-0"
           >
             Edit
           </Link>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 text-xs uppercase tracking-wider text-muted">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 text-[11px] uppercase tracking-[0.14em] text-muted">
         {recipe.servings && <span>Serves {recipe.servings}</span>}
         {recipe.prep_time && <span>Prep {recipe.prep_time}m</span>}
         {recipe.cook_time && <span>Cook {recipe.cook_time}m</span>}
@@ -125,9 +125,9 @@ export default function RecipePage() {
         </div>
       )}
 
-      <div className="md:grid md:grid-cols-[260px_1fr] md:gap-10">
+      <div className="md:grid md:grid-cols-[minmax(260px,1fr)_2fr] md:gap-10">
         <aside className="mb-8 md:mb-0">
-          <div className="bg-paper border border-line rounded-md p-5 md:sticky md:top-6">
+          <div className="bg-paper border border-panel-line rounded-md p-5 md:sticky md:top-6">
             <IngredientList
               ingredients={recipe.ingredients}
               nutritionRows={nutrition?.rows}
