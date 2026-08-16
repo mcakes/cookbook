@@ -44,7 +44,7 @@ export default function IngredientSearch({
           {selected.map((ing) => (
             <span
               key={ing}
-              className="text-sm px-2 py-1 rounded-full bg-tag text-tag-ink cursor-pointer hover:bg-tag hover:text-danger"
+              className="text-sm px-2.5 py-1 rounded-full bg-accent text-paper cursor-pointer hover:bg-accent-hover transition-colors"
               onClick={() => removeIngredient(ing)}
             >
               {ing} ×
@@ -64,7 +64,7 @@ export default function IngredientSearch({
               <button
                 key={ing}
                 onClick={() => addIngredient(ing)}
-                className="block w-full text-left px-3 py-2 text-sm hover:bg-tag"
+                className="block w-full text-left px-3 py-2 text-sm hover:bg-wash"
               >
                 {ing}
               </button>
@@ -79,11 +79,11 @@ export default function IngredientSearch({
             <Link
               key={r.slug}
               to={`/recipe/${r.slug}`}
-              className="block p-4 bg-paper rounded-lg shadow-sm hover:shadow-md"
+              className="block p-4 bg-paper rounded-md border border-panel-line transition-colors hover:border-accent"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold">{r.title}</h3>
+                  <h3 className="font-display text-lg text-ink">{r.title}</h3>
                   <p className="text-sm text-accent mt-1">
                     {r.matchCount} ingredient{r.matchCount !== 1 ? "s" : ""} matched
                   </p>
